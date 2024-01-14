@@ -1,0 +1,6 @@
+- id: commitlint
+  name: commitlint
+  description: "commitlint for conventional commit message"
+  entry: commitlint --file
+  language: python
+  stages: [commit-msg]
