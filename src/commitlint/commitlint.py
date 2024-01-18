@@ -1,61 +1,124 @@
-"""This module contains source for commitlint"""
+"""
+This module provides functionality for validating commit messages according
+to conventional commit standards.
+
+Usage:
+------
+
+```python
+from commitlint import check_commit_message
+
+commit_message = "feat(module): add module documentation"
+success, errors = check_commit_message(commit_message)
+```
+"""
 import re
-import sys
+from typing import List, Tuple
 
-COMMIT_MAX_LENGTH = 72
+from .constants import COMMIT_MAX_LENGTH
+from .messages import HEADER_LENGTH_ERROR, INCORRECT_FORMAT_ERROR
+
+CONVENTIONAL_COMMIT_PATTERN = (
+    r"(?s)"  # To explicitly make . match new line
+    r"(?P<type>build|ci|docs|feat|fix|perf|refactor|style|test|chore|revert|bump)"
+    r"(?P<scope>\(\S+\))?!?:"
+    r"(?: (?P<description>[^\n\r]+))"
+    r"((\n\n(?P<body>.*))|(\s*))?$"
+)
+
+IGNORED_PATTERN = (
+    r"^((Merge pull request)|(Merge (.*?) into (.*?)|(Merge branch (.*?)))(?:\r?\n)*$)|"
+    r"^(Merge tag (.*?))(?:\r?\n)*$|"
+    r"^(R|r)evert (.*)|"
+    r"^(Merged (.*?)(in|into) (.*)|Merged PR (.*): (.*))$|"
+    r"^Merge remote-tracking branch(\s*)(.*)$|"
+    r"^Automatic merge(.*)$|"
+    r"^Auto-merged (.*?) into (.*)$"
+)
 
 
-def is_conventional_commit(commit_message: str) -> bool:
+def is_ignored(commit_message: str) -> bool:
     """
-    Checks if a commit message follows the conventional commit format.
+    Checks if a commit message should be ignored.
+
+    Some commit messages like merge, revert, auto merge, etc is ignored
+    from linting.
 
     Args:
-        commit_message (str): The commit message to be checked.
+        commit_message (str): The commit message to check.
 
     Returns:
-        bool: True if the commit message follows the conventional commit format,
-              False otherwise.
+        bool: True if the commit message should be ignored, False otherwise.
     """
-    pattern = re.compile(r"^(\w+)(\([^\)]+\))?: .+")
-    return bool(pattern.match(commit_message))
+    return bool(re.match(IGNORED_PATTERN, commit_message))
 
 
-def is_valid_length(commit_message: str, max_length: int) -> bool:
-    """
-    Checks if a commit message has a valid length.
+def remove_comments(msg: str) -> str:
+    """Removes comments from the commit message.
+
+    For `git commit --verbose`, excluding the diff generated message,
+    for example:
+
+    ```bash
+    ...
+    # ------------------------ >8 ------------------------
+    # Do not modify or remove the line above.
+    # Everything below it will be ignored.
+    diff --git a/... b/...
+    ...
+    ```
 
     Args:
-        commit_message (str): The commit message to be checked.
-        max_length (int): The maximum allowed length for the commit message.
+        msg(str): The commit message to remove comments.
 
     Returns:
-        bool: True if the commit message length is valid, False otherwise.
+        str: The commit message without comments.
     """
-    return len(commit_message) <= max_length
+
+    lines: List[str] = []
+    for line in msg.split("\n"):
+        if "# ------------------------ >8 ------------------------" in line:
+            # ignoring all the verbose message below this line
+            break
+        if not line.startswith("#"):
+            lines.append(line)
+
+    return "\n".join(lines)
 
 
-def check_commit_message(commit_message: str) -> None:
+def check_commit_message(commit_message: str) -> Tuple[bool, List[str]]:
     """
-    Check the validity of a commit message.
+    Checks the validity of a commit message. Returns success and error list.
 
     Args:
         commit_message (str): The commit message to be validated.
 
-    Raises:
-        SystemExit: Exits the program with status code 1 if the commit message
-                    violates length or conventional commit format rules.
-
     Returns:
-        None: This function does not return any value; it either exits or
-              continues based on the validity of the commit message.
+        Tuple[bool, List[str]]: Returns success as a first element and list
+        of errors on the second elements. If success is true, errors will be
+        empty.
     """
-    if not is_valid_length(commit_message, max_length=COMMIT_MAX_LENGTH):
-        sys.stderr.write(
-            "Commit message is too long. "
-            f"Max length is {COMMIT_MAX_LENGTH} characters.\n"
-        )
-        sys.exit(1)
+    # default values
+    success = True
+    errors: List[str] = []
 
-    if not is_conventional_commit(commit_message):
-        sys.stderr.write("Commit message does not follow conventional commit format.\n")
-        sys.exit(1)
+    # removing unnecessary commit comments
+    commit_message = remove_comments(commit_message)
+
+    # checking if commit message should be ignored
+    if is_ignored(commit_message):
+        return success, errors
+
+    # checking the length of header
+    header = commit_message.split("\n").pop()
+    if len(header) > COMMIT_MAX_LENGTH:
+        success = False
+        errors.append(HEADER_LENGTH_ERROR)
+
+    # matching commit message with the commit pattern
+    pattern_match = re.match(CONVENTIONAL_COMMIT_PATTERN, commit_message)
+    if pattern_match is None:
+        success = False
+        errors.append(INCORRECT_FORMAT_ERROR)
+
+    return success, errors
