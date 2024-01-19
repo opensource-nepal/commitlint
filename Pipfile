@@ -13,4 +13,5 @@ pytest-cov = "*"
 [scripts]
 test = "pytest"
 coverage = "pytest --cov=src/ --no-cov-on-fail"
+coverage-html = "pytest --cov=src/ --cov-report=html --no-cov-on-fail"
 install-hooks = "pre-commit install --hook-type pre-commit --hook-type commit-msg"

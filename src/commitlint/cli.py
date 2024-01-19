@@ -82,10 +82,10 @@ def main() -> None:
     if success:
         sys.stdout.write(f"{COMMIT_SUCCESSFUL}\n")
         sys.exit(0)
-
-    _show_errors(errors)
-    sys.exit(1)
+    else:
+        _show_errors(errors)
+        sys.exit(1)
 
 
 if __name__ == "__main__":
-    main()
+    main()  # pragma: no cover
