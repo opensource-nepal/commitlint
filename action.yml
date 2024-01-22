@@ -1,0 +1,38 @@
+name: 'commitlint'
+description: 'A GitHub Action to check conventional commit message'
+runs:
+  using: 'composite'
+  steps:
+    - name: Install Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.8'
+
+    # for push event
+    - name: Get pushed commit count
+      if: github.event_name == 'push'
+      id: push_commit_count
+      run: |
+        echo "count=$(echo '${{ toJson(github.event.commits) }}' | jq '. | length')" \
+          >> $GITHUB_OUTPUT
+      shell: bash
+    - name: Checkout to pushed commits
+      if: github.event_name == 'push'
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.sha }}
+        fetch-depth: ${{ steps.push_commit_count.outputs.count }}
+
+    # for pull_request event
+    - name: Checkout to PR source branch
+      if: github.event_name == 'pull_request'
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+        fetch-depth: ${{ github.event.pull_request.commits }}
+
+    # checking the commits (for both push and pull_request)
+    - name: Check the commits
+      id: commitlint
+      run: python github_actions/run.py
+      shell: bash
