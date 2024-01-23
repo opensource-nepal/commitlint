@@ -2,19 +2,19 @@
 # pylint: disable=all
 
 from src.commitlint import check_commit_message
-from src.commitlint.constants import COMMIT_MAX_LENGTH
+from src.commitlint.constants import COMMIT_HEADER_MAX_LENGTH
 from src.commitlint.messages import HEADER_LENGTH_ERROR, INCORRECT_FORMAT_ERROR
 
 
 def test__check_commit_message__header_length_error():
-    commit_message = "feat: " + "a" * (COMMIT_MAX_LENGTH + 1)
+    commit_message = "feat: " + "a" * (COMMIT_HEADER_MAX_LENGTH + 1)
     success, errors = check_commit_message(commit_message)
     assert success is False
     assert HEADER_LENGTH_ERROR in errors
 
 
 def test__check_commit_message__header_length_valid():
-    commit_message = "feat: " + "a" * (COMMIT_MAX_LENGTH - 1)
+    commit_message = "feat: " + "a" * (COMMIT_HEADER_MAX_LENGTH - 1)
     success, errors = check_commit_message(commit_message)
     assert success is False
     assert HEADER_LENGTH_ERROR in errors
@@ -28,7 +28,7 @@ def test__check_commit_message__incorrect_format_error():
 
 
 def test__check_commit_message__incorrect_format_error_and_health_length_invalid():
-    commit_message = "Test " + "a" * (COMMIT_MAX_LENGTH + 1)
+    commit_message = "Test " + "a" * (COMMIT_HEADER_MAX_LENGTH + 1)
     success, errors = check_commit_message(commit_message)
     assert success is False
     assert HEADER_LENGTH_ERROR in errors

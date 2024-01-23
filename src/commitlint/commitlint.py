@@ -15,7 +15,7 @@ success, errors = check_commit_message(commit_message)
 import re
 from typing import List, Tuple
 
-from .constants import COMMIT_MAX_LENGTH
+from .constants import COMMIT_HEADER_MAX_LENGTH
 from .messages import HEADER_LENGTH_ERROR, INCORRECT_FORMAT_ERROR
 
 CONVENTIONAL_COMMIT_PATTERN = (
@@ -111,7 +111,7 @@ def check_commit_message(commit_message: str) -> Tuple[bool, List[str]]:
 
     # checking the length of header
     header = commit_message.split("\n").pop()
-    if len(header) > COMMIT_MAX_LENGTH:
+    if len(header) > COMMIT_HEADER_MAX_LENGTH:
         success = False
         errors.append(HEADER_LENGTH_ERROR)
 
