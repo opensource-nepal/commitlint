@@ -59,10 +59,10 @@ on:
 jobs:
   commitlint:
     runs-on: ubuntu-latest
-    name: Check commit messages
+    name: Commitlint
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+
       - name: Run commitlint
         uses: opensource-nepal/commitlint@0.1.0
 ```
