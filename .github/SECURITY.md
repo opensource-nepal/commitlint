@@ -8,7 +8,7 @@ We provide security updates and support for the latest stable release of the 'co
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 0.1.0   | :white_check_mark: |
+| 0.2.0   | :white_check_mark: |
 
 ## Reporting a Vulnerability
 

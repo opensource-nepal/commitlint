@@ -19,7 +19,7 @@ commitlint is a tool designed to lint your commit messages according to the [Con
    ...
 
    - repo: https://github.com/opensource-nepal/commitlint
-       rev: 0.1.0
+       rev: 0.2.0
        hooks:
        - id: commitlint
 
@@ -42,7 +42,7 @@ If you have any existing workflows, add the following steps:
 steps:
     ...
     - name: Run commitlint
-    uses: opensource-nepal/commitlint@0.1.0
+    uses: opensource-nepal/commitlint@0.2.0
     ...
 ```
 
@@ -64,7 +64,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Run commitlint
-        uses: opensource-nepal/commitlint@0.1.0
+        uses: opensource-nepal/commitlint@0.2.0
 ```
 
 > **_NOTE:_** commitlint GitHub Actions will only be triggered by "push" or "pull_request" events.

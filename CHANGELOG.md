@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 0.1.0
+## 0.2.0
 
 - Created commitlint CLI.
 - Created pre-commit configuration for `commit-msg` hook.

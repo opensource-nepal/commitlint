@@ -15,4 +15,4 @@ jobs:
       - name: Run commitlint
         uses: ./ # Uses an action in the root directory
         # or use a released GitHub Action
-        # uses: opensource-nepal/commitlint@0.1.0
+        # uses: opensource-nepal/commitlint@0.2.0
