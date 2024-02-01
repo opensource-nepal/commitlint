@@ -6,9 +6,9 @@ The 'commitlint' project is committed to maintaining the security and integrity 
 
 We provide security updates and support for the latest stable release of the 'commitlint' package. It is important to keep your software up to date to ensure you have the latest security patches.
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 0.2.0   | :white_check_mark: |
+| Version  | Supported          |
+| -------- | ------------------ |
+| >= 0.2.0 | :white_check_mark: |
 
 ## Reporting a Vulnerability
 

@@ -1,5 +1,8 @@
-name: "commitlint"
+name: "Conventional Commitlint"
 description: "A GitHub Action to check conventional commit message"
+branding:
+  color: "red"
+  icon: "git-commit"
 runs:
   using: "composite"
   steps:
