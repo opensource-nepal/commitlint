@@ -12,11 +12,13 @@ Usage:
         commitlint --file path/to/your/file.txt
 
 """
+
 import argparse
 import os
 import sys
 from typing import List
 
+from .__version__ import __version__
 from .commitlint import check_commit_message, remove_comments
 from .exceptions import CommitlintException
 from .git_helpers import get_commit_message_of_hash, get_commit_messages_of_hash_range
@@ -35,6 +37,11 @@ def get_args() -> argparse.Namespace:
     """
     parser = argparse.ArgumentParser(
         description="Check if a commit message follows the conventional commit format."
+    )
+
+    # version
+    parser.add_argument(
+        "-V", "--version", action="version", version=f"%(prog)s {__version__}"
     )
 
     # for commit message check
