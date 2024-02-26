@@ -69,6 +69,20 @@ jobs:
 
 > **_NOTE:_** commitlint GitHub Actions will only be triggered by "push" or "pull_request" events.
 
+#### GitHub Action Inputs
+
+| #   | Name              | Type       | Default    | Description |
+| --- | ----------------- | -----------| -----------| ----------- |
+|  1  | **fail_on_error** | Boolean    | true       |  Determines whether the GitHub Action should fail when encountering an error. |
+
+
+#### GitHub Action Outputs
+
+| #   | Name           | Type          | Description  |
+| --- | -------------- | --------------| ------------ |
+| 1   | **exit_code**  | Integer       | The exit code indicating the success or failure of the GitHub Actions workflow. |
+| 2   | **status**     |'failure' \| 'success'| The status of the GitHub Actions workflow, indicating success or failure. |
+
 ## Contribution
 
 We appreciate feedback and contribution to this package. To get started please see our [contribution guide](./CONTRIBUTING.md).
