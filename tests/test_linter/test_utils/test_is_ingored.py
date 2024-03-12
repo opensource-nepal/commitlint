@@ -3,7 +3,7 @@
 
 import pytest
 
-from src.commitlint.commitlint import is_ignored
+from commitlint.linter.utils import is_ignored
 
 
 @pytest.mark.parametrize(

@@ -5,11 +5,11 @@ from unittest.mock import patch
 
 import pytest
 
-from src.commitlint.exceptions import (
+from commitlint.exceptions import (
     GitCommitNotFoundException,
     GitInvalidCommitRangeException,
 )
-from src.commitlint.git_helpers import (
+from commitlint.git_helpers import (
     get_commit_message_of_hash,
     get_commit_messages_of_hash_range,
 )
@@ -19,7 +19,7 @@ DELIMITER = "========commit-delimiter========"
 
 @pytest.fixture
 def mock_subprocess():
-    with patch("src.commitlint.git_helpers.subprocess") as mock_subprocess:
+    with patch("commitlint.git_helpers.subprocess") as mock_subprocess:
         mock_subprocess.PIPE = subprocess.PIPE
         mock_subprocess.CalledProcessError = subprocess.CalledProcessError
         yield mock_subprocess
@@ -52,7 +52,7 @@ def test_get_commit_message_of_hash_failure(mock_subprocess):
 
 
 @patch(
-    "src.commitlint.git_helpers.get_commit_message_of_hash",
+    "commitlint.git_helpers.get_commit_message_of_hash",
     return_value="From commit message",
 )
 def test_get_commit_messages_of_hash_range_success(
@@ -82,7 +82,7 @@ def test_get_commit_messages_of_hash_range_success(
 
 
 @patch(
-    "src.commitlint.git_helpers.get_commit_message_of_hash",
+    "commitlint.git_helpers.get_commit_message_of_hash",
     return_value="From commit message",
 )
 def test_get_commit_messages_of_hash_range_failure(
