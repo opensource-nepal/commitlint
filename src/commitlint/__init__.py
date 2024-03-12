@@ -1,5 +1,5 @@
-"""Main module for commitlint"""
+"""Main module for commitlint."""
 
-from .commitlint import check_commit_message
+from .linter import lint_commit_message
 
-__all__ = ["check_commit_message"]
+__all__ = ["lint_commit_message"]

@@ -1,7 +1,7 @@
 # type: ignore
 # pylint: disable=all
 
-from src.commitlint.commitlint import remove_comments
+from commitlint.linter.utils import remove_comments
 
 
 def test__remove_comments__no_comments():

@@ -1,6 +1,7 @@
 """
 This module contains the git related helper functions.
 """
+
 import subprocess
 from typing import List
 

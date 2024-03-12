@@ -2,6 +2,7 @@
 This script contains actions to be taken based on GitHub events,
 specifically for push and pull_request events.
 """
+
 import os
 import subprocess
 import sys
