@@ -68,4 +68,4 @@ jobs:
         uses: liskin/gh-problem-matcher-wrap@v3
         with:
           linters: isort
-          run: isort --line-length=88 --check src/
+          run: isort --line-length=88 --check --profile black src/

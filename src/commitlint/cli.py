@@ -19,10 +19,11 @@ import sys
 from typing import List
 
 from .__version__ import __version__
-from .commitlint import check_commit_message, remove_comments
 from .exceptions import CommitlintException
 from .git_helpers import get_commit_message_of_hash, get_commit_messages_of_hash_range
-from .messages import VALIDATION_SUCCESSFUL
+from .linter import lint_commit_message
+from .linter.utils import remove_comments
+from .messages import VALIDATION_FAILED, VALIDATION_SUCCESSFUL
 
 
 def get_args() -> argparse.Namespace:
@@ -57,28 +58,43 @@ def get_args() -> argparse.Namespace:
     # --to-hash is optional
     parser.add_argument("--to-hash", type=str, help="To commit hash", default="HEAD")
 
+    # feature options
+    parser.add_argument(
+        "--quick", action="store_true", help="Check the commit message quickly."
+    )
+
     # parsing args
     args = parser.parse_args()
 
     return args
 
 
-def _show_errors(commit_message: str, errors: List[str]) -> None:
+def _show_errors(
+    commit_message: str,
+    errors: List[str],
+    short: bool = False,
+) -> None:
     """
     Display a formatted error message for a list of errors.
 
     Args:
+        commit_message (str): The commit message to display.
         errors (List[str]): A list of error messages to be displayed.
+        short (bool): Display the error message in short.
+
     """
     error_count = len(errors)
     commit_message = remove_comments(commit_message)
 
-    sys.stderr.write(
-        f"⧗ Input:\n{commit_message}\n\n✖ Found {error_count} error(s).\n\n"
-    )
-    for index, error in enumerate(errors):
-        end_char = "" if index == error_count - 1 else "\n"
-        sys.stderr.write(f"- {error}\n{end_char}")
+    sys.stderr.write(f"⧗ Input:\n{commit_message}\n\n")
+
+    if short:
+        sys.stderr.write(f"{VALIDATION_FAILED}\n")
+        return
+
+    sys.stderr.write(f"✖ Found {error_count} error(s).\n")
+    for error in errors:
+        sys.stderr.write(f"- {error}\n")
 
 
 def _get_commit_message_from_file(filepath: str) -> str:
@@ -101,26 +117,27 @@ def _get_commit_message_from_file(filepath: str) -> str:
         return commit_message
 
 
-def _handle_commit_message(commit_message: str) -> None:
+def _handle_commit_message(commit_message: str, quick: bool) -> None:
     """
     Handles a single commit message, checks its validity, and prints the result.
 
     Args:
         commit_message (str): The commit message to be handled.
+        quick (bool): True for quick linting.
 
     Raises:
         SystemExit: If the commit message is invalid.
     """
-    success, errors = check_commit_message(commit_message)
+    success, errors = lint_commit_message(commit_message, quick=quick)
 
     if success:
         sys.stdout.write(f"{VALIDATION_SUCCESSFUL}\n")
     else:
-        _show_errors(commit_message, errors)
+        _show_errors(commit_message, errors, short=quick)
         sys.exit(1)
 
 
-def _handle_multiple_commit_messages(commit_messages: List[str]) -> None:
+def _handle_multiple_commit_messages(commit_messages: List[str], quick: bool) -> None:
     """
     Handles multiple commit messages, checks their validity, and prints the result.
 
@@ -132,10 +149,10 @@ def _handle_multiple_commit_messages(commit_messages: List[str]) -> None:
     """
     has_error = False
     for commit_message in commit_messages:
-        success, errors = check_commit_message(commit_message)
+        success, errors = lint_commit_message(commit_message, quick=quick)
         if not success:
             has_error = True
-            _show_errors(commit_message, errors)
+            _show_errors(commit_message, errors, short=quick)
             sys.stderr.write("\n")
 
     if has_error:
@@ -153,18 +170,18 @@ def main() -> None:
     try:
         if args.file:
             commit_message = _get_commit_message_from_file(args.file)
-            _handle_commit_message(commit_message)
+            _handle_commit_message(commit_message, quick=args.quick)
         elif args.hash:
             commit_message = get_commit_message_of_hash(args.hash)
-            _handle_commit_message(commit_message)
+            _handle_commit_message(commit_message, quick=args.quick)
         elif args.from_hash:
             commit_messages = get_commit_messages_of_hash_range(
                 args.from_hash, args.to_hash
             )
-            _handle_multiple_commit_messages(commit_messages)
+            _handle_multiple_commit_messages(commit_messages, quick=args.quick)
         else:
             commit_message = args.commit_message.strip()
-            _handle_commit_message(commit_message)
+            _handle_commit_message(commit_message, quick=args.quick)
     except CommitlintException as ex:
         sys.stderr.write(f"{ex}\n")
         sys.exit(1)

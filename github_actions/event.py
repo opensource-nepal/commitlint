@@ -5,6 +5,7 @@ Note:
     This module relies on the presence of specific environment variables
     set by GitHub Actions.
 """
+
 import json
 import os
 from typing import Any, Dict
