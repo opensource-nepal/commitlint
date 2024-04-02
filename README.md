@@ -39,6 +39,7 @@ commitlint is a tool designed to lint your commit messages according to the [Con
 If you have any existing workflows, add the following steps:
 
 ```yaml
+...
 steps:
     ...
     - name: Run commitlint
@@ -71,17 +72,16 @@ jobs:
 
 #### GitHub Action Inputs
 
-| #   | Name              | Type       | Default    | Description |
-| --- | ----------------- | -----------| -----------| ----------- |
-|  1  | **fail_on_error** | Boolean    | true       |  Determines whether the GitHub Action should fail when encountering an error. |
-
+| #   | Name              | Type    | Default | Description                                                           |
+| --- | ----------------- | ------- | ------- | --------------------------------------------------------------------- |
+| 1   | **fail_on_error** | Boolean | true    | Determines whether the GitHub Action should fail if commitlint fails. |
 
 #### GitHub Action Outputs
 
-| #   | Name           | Type          | Description  |
-| --- | -------------- | --------------| ------------ |
-| 1   | **exit_code**  | Integer       | The exit code indicating the success or failure of the GitHub Actions workflow. |
-| 2   | **status**     |'failure' \| 'success'| The status of the GitHub Actions workflow, indicating success or failure. |
+| #   | Name          | Type    | Description                                                                  |
+| --- | ------------- | ------- | ---------------------------------------------------------------------------- |
+| 1   | **exit_code** | Integer | The exit code of the commitlint step.                                        |
+| 2   | **status**    | String  | The outcome of the commitlint step. Possible values: 'success' or 'failure'. |
 
 ## Contribution
 

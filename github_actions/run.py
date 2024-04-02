@@ -152,6 +152,7 @@ def _check_commits(from_hash: str, to_hash: str) -> None:
         _write_output("exit_code", 0)
 
     except subprocess.CalledProcessError as error:
+        sys.stderr.write("::error::Commit validation failed!\n")
         _write_output("status", STATUS_FAILURE)
         _write_output("exit_code", error.returncode)
         val = _get_input(INPUT_FAIL_ON_ERROR)
