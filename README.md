@@ -86,8 +86,14 @@ jobs:
 
 ## CLI (Command Line Interface)
 
-### Help Example
+### Installation 
+
 ```shell
+pip install commitlint
+```
+
+### Usage
+```
 $ commitlint --help
 usage: commitlint [-h] [-V] [--file FILE] [--hash HASH] [--from-hash FROM_HASH] [--to-hash TO_HASH] [--skip-detail] [commit_message]
 
@@ -107,7 +113,7 @@ optional arguments:
   --skip-detail         Skip the detailed error message check
 ```
 
-### Usage Examples
+### Examples
 Check commit message directly:
  
 ```shell
