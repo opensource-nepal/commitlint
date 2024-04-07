@@ -83,6 +83,77 @@ jobs:
 | 1   | **exit_code** | Integer | The exit code of the commitlint step.                                        |
 | 2   | **status**    | String  | The outcome of the commitlint step. Possible values: 'success' or 'failure'. |
 
+
+## CLI (Command Line Interface)
+
+### Installation 
+
+```shell
+pip install commitlint
+```
+
+### Usage
+```
+$ commitlint --help
+usage: commitlint [-h] [-V] [--file FILE] [--hash HASH] [--from-hash FROM_HASH] [--to-hash TO_HASH] [--skip-detail] [commit_message]
+
+Check if a commit message follows the conventional commit format.
+
+positional arguments:
+  commit_message        The commit message to be checked.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -V, --version         show program's version number and exit
+  --file FILE           Path to a file containing the commit message.
+  --hash HASH           Commit hash
+  --from-hash FROM_HASH
+                        From commit hash
+  --to-hash TO_HASH     To commit hash
+  --skip-detail         Skip the detailed error message check
+```
+
+### Examples
+Check commit message directly:
+ 
+```shell
+$ commitlint "chore: my commit message"
+```
+
+Check commit message from file:
+
+```shell
+$ commitlint --file /foo/bar/commit-message.txt
+```
+
+Check commit message of a hash:
+
+```shell
+$ commitlint --hash 9a8c08173
+```
+
+Check commit message of a hash range:
+
+```shell
+$ commitlint --from-hash 00bf73fef7 --to-hash d6301f1eb0
+```
+
+Check commit message skipping the detail check:
+
+```shell
+$ commitlint --skip-detail "chore: my commit message"
+# or
+$ commitlint --skip-detail --hash 9a8c08173
+```
+
+Version check:
+
+```shell
+$ commitlint --version
+# or
+$ commitlint -V
+```
+
 ## Contribution
 
 We appreciate feedback and contribution to this package. To get started please see our [contribution guide](./CONTRIBUTING.md).
