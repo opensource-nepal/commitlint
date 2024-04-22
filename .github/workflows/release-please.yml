@@ -1,0 +1,17 @@
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+name: release-please
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Release 
+      uses: google-github-actions/release-please-action@v4
+      with:
+        token: ${{ secrets.CI_RELEASE_PLEASE_TOKEN }}
+        release-type: simple
