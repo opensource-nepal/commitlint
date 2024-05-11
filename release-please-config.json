@@ -1,0 +1,13 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "packages": {
+    ".": {
+      "extra-files": [
+        "src/commitlint/__version__.py"
+      ]
+    }
+  },
+  "pull-request-header": "Release PR",
+  "pull-request-title-pattern": "chore: release v${version}",
+  "release-type": "simple"
+}
