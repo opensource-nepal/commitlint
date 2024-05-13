@@ -18,7 +18,11 @@ class TestCLIGetArgs:
     @patch(
         "argparse.ArgumentParser.parse_args",
         return_value=MagicMock(
-            commit_message="commit message", file=None, hash=None, from_hash=None
+            commit_message="commit message",
+            file=None,
+            hash=None,
+            from_hash=None,
+            quiet=None,
         ),
     )
     def test__get_args__with_commit_message(self, *_):
@@ -27,6 +31,7 @@ class TestCLIGetArgs:
         assert args.file is None
         assert args.hash is None
         assert args.from_hash is None
+        assert args.quiet is None
 
     @patch(
         "argparse.ArgumentParser.parse_args",
@@ -88,6 +93,7 @@ class TestCLIMain:
             hash=None,
             from_hash=None,
             skip_detail=False,
+            quiet=False,
         ),
     )
     @patch("sys.stdout.write")
@@ -107,6 +113,7 @@ class TestCLIMain:
             hash=None,
             from_hash=None,
             skip_detail=True,
+            quiet=False,
         ),
     )
     @patch("sys.stdout.write")
@@ -126,6 +133,7 @@ class TestCLIMain:
             hash=None,
             from_hash=None,
             skip_detail=False,
+            quiet=False,
         ),
     )
     @patch("sys.stderr.write")
@@ -154,6 +162,7 @@ class TestCLIMain:
             hash=None,
             from_hash=None,
             skip_detail=True,
+            quiet=False,
         ),
     )
     @patch("sys.stderr.write")
@@ -177,7 +186,7 @@ class TestCLIMain:
 
     @patch(
         "commitlint.cli.get_args",
-        return_value=MagicMock(file="path/to/file.txt", skip_detail=False),
+        return_value=MagicMock(file="path/to/file.txt", skip_detail=False, quiet=False),
     )
     @patch("sys.stdout.write")
     @patch("builtins.open", mock_open(read_data="feat: valid commit message"))
@@ -187,7 +196,7 @@ class TestCLIMain:
 
     @patch(
         "commitlint.cli.get_args",
-        return_value=MagicMock(file="path/to/file.txt", skip_detail=False),
+        return_value=MagicMock(file="path/to/file.txt", skip_detail=False, quiet=False),
     )
     @patch("sys.stderr.write")
     @patch("sys.exit")
@@ -209,7 +218,9 @@ class TestCLIMain:
 
     @patch(
         "commitlint.cli.get_args",
-        return_value=MagicMock(file=None, hash="commit_hash", skip_detail=False),
+        return_value=MagicMock(
+            file=None, hash="commit_hash", skip_detail=False, quiet=False
+        ),
     )
     @patch("commitlint.cli.get_commit_message_of_hash")
     @patch("sys.stdout.write")
@@ -222,7 +233,9 @@ class TestCLIMain:
 
     @patch(
         "commitlint.cli.get_args",
-        return_value=MagicMock(file=None, hash="commit_hash", skip_detail=False),
+        return_value=MagicMock(
+            file=None, hash="commit_hash", skip_detail=False, quiet=False
+        ),
     )
     @patch("commitlint.cli.get_commit_message_of_hash")
     @patch("sys.stderr.write")
@@ -251,6 +264,7 @@ class TestCLIMain:
             from_hash="start_commit_hash",
             to_hash="end_commit_hash",
             skip_detail=False,
+            quiet=False,
         ),
     )
     @patch("commitlint.cli.get_commit_messages_of_hash_range")
@@ -273,6 +287,7 @@ class TestCLIMain:
             from_hash="invalid_start_hash",
             to_hash="end_commit_hash",
             skip_detail=False,
+            quiet=False,
         ),
     )
     @patch("sys.stderr.write")
@@ -308,3 +323,101 @@ class TestCLIMain:
         main()
         mock_sys_exit.assert_called_with(1)
         mock_stderr_write.assert_called_with("Test message\n")
+
+    @patch(
+        "commitlint.cli.get_args",
+        return_value=MagicMock(
+            commit_message="Invalid commit message",
+            file=None,
+            hash=None,
+            from_hash=None,
+            skip_detail=False,
+            quiet=True,
+        ),
+    )
+    @patch("sys.stdout.write")
+    @patch("sys.stderr.write")
+    @patch("sys.exit")
+    def test__main__quiet_option_with_invalid_commit_message(
+        self, mock_sys_exit, mock_stderr_write, mock_stdout_write, *_
+    ):
+        main()
+        mock_stderr_write.assert_not_called()
+        mock_stdout_write.assert_not_called()
+
+    @patch(
+        "commitlint.cli.get_args",
+        return_value=MagicMock(
+            commit_message="feat: valid commit message",
+            file=None,
+            hash=None,
+            from_hash=None,
+            skip_detail=False,
+            quiet=True,
+        ),
+    )
+    @patch("sys.stdout.write")
+    @patch("sys.stderr.write")
+    @patch("sys.exit")
+    def test__main__quiet_option_with_valid_commit_message(
+        self, mock_sys_exit, mock_stderr_write, mock_stdout_write, *_
+    ):
+        main()
+        mock_stderr_write.assert_not_called()
+        mock_stdout_write.assert_not_called()
+        mock_sys_exit.assert_not_called()
+
+    @patch(
+        "commitlint.cli.get_args",
+        return_value=MagicMock(
+            file=None,
+            hash=None,
+            from_hash="start_commit_hash",
+            to_hash="end_commit_hash",
+            skip_detail=False,
+            quiet=True,
+        ),
+    )
+    @patch("commitlint.cli.get_commit_messages_of_hash_range")
+    @patch("sys.stdout.write")
+    def test__valid_commit_message_with_hash_range_in_quiet(
+        self, mock_stdout_write, mock_get_commit_messages, *_
+    ):
+        mock_get_commit_messages.return_value = [
+            "feat: commit message 1",
+            "fix: commit message 2",
+        ]
+        main()
+        mock_stdout_write.assert_not_called()
+
+    @patch(
+        "commitlint.cli.get_args",
+        return_value=MagicMock(
+            file=None,
+            hash=None,
+            from_hash="start_commit_hash",
+            to_hash="end_commit_hash",
+            skip_detail=False,
+            quiet=True,
+        ),
+    )
+    @patch("commitlint.cli.get_commit_messages_of_hash_range")
+    @patch("sys.exit")
+    @patch("sys.stdout.write")
+    @patch("sys.stderr.write")
+    def test__invalid_commit_message_with_hash_range_in_quiet(
+        self,
+        mock_stderr_write,
+        mock_stdout_write,
+        mock_sys_exit,
+        mock_get_commit_messages,
+        *_,
+    ):
+        mock_get_commit_messages.return_value = [
+            "Invalid commit message 1",
+            "Invalid commit message 2",
+        ]
+        main()
+        mock_stderr_write.assert_not_called()
+        mock_sys_exit.assert_called_once_with(1)
+        mock_stdout_write.assert_not_called()

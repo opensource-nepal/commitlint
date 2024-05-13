@@ -64,7 +64,14 @@ def get_args() -> argparse.Namespace:
         action="store_true",
         help="Skip the detailed error message check",
     )
-
+    # --quiet option is optional
+    parser.add_argument(
+        "-q",
+        "--quiet",
+        action="store_true",
+        help="Ignore stdout and stderr",
+        default=False,
+    )
     # parsing args
     args = parser.parse_args()
 
@@ -119,28 +126,37 @@ def _get_commit_message_from_file(filepath: str) -> str:
         return commit_message
 
 
-def _handle_commit_message(commit_message: str, skip_detail: bool) -> None:
+def _handle_commit_message(
+    commit_message: str, skip_detail: bool, quiet: bool = False
+) -> None:
     """
     Handles a single commit message, checks its validity, and prints the result.
 
     Args:
         commit_message (str): The commit message to be handled.
         skip_detail (bool): Whether to skip the detailed error linting.
+        quiet (bool): Whether to ignore stout and stderr
 
     Raises:
         SystemExit: If the commit message is invalid.
     """
     success, errors = lint_commit_message(commit_message, skip_detail=skip_detail)
 
+    if success and quiet:
+        return
+
     if success:
         sys.stdout.write(f"{VALIDATION_SUCCESSFUL}\n")
-    else:
+        return
+
+    if not quiet:
         _show_errors(commit_message, errors, skip_detail=skip_detail)
-        sys.exit(1)
+
+    sys.exit(1)
 
 
 def _handle_multiple_commit_messages(
-    commit_messages: List[str], skip_detail: bool
+    commit_messages: List[str], skip_detail: bool, quiet: bool = False
 ) -> None:
     """
     Handles multiple commit messages, checks their validity, and prints the result.
@@ -148,21 +164,26 @@ def _handle_multiple_commit_messages(
     Args:
         commit_messages (List[str]): List of commit messages to be handled.
         skip_detail (bool): Whether to skip the detailed error linting.
-
+        quiet (bool): Whether to show the error and messages in console
     Raises:
         SystemExit: If any of the commit messages is invalid.
     """
     has_error = False
+
     for commit_message in commit_messages:
         success, errors = lint_commit_message(commit_message, skip_detail=skip_detail)
-        if not success:
-            has_error = True
+        if success:
+            continue
+
+        has_error = True
+        if not quiet:
             _show_errors(commit_message, errors, skip_detail=skip_detail)
             sys.stderr.write("\n")
 
     if has_error:
         sys.exit(1)
-    else:
+
+    if not quiet:
         sys.stdout.write(f"{VALIDATION_SUCCESSFUL}\n")
 
 
@@ -175,20 +196,26 @@ def main() -> None:
     try:
         if args.file:
             commit_message = _get_commit_message_from_file(args.file)
-            _handle_commit_message(commit_message, skip_detail=args.skip_detail)
+            _handle_commit_message(
+                commit_message, skip_detail=args.skip_detail, quiet=args.quiet
+            )
         elif args.hash:
             commit_message = get_commit_message_of_hash(args.hash)
-            _handle_commit_message(commit_message, skip_detail=args.skip_detail)
+            _handle_commit_message(
+                commit_message, skip_detail=args.skip_detail, quiet=args.quiet
+            )
         elif args.from_hash:
             commit_messages = get_commit_messages_of_hash_range(
                 args.from_hash, args.to_hash
             )
             _handle_multiple_commit_messages(
-                commit_messages, skip_detail=args.skip_detail
+                commit_messages, skip_detail=args.skip_detail, quiet=args.quiet
             )
         else:
             commit_message = args.commit_message.strip()
-            _handle_commit_message(commit_message, skip_detail=args.skip_detail)
+            _handle_commit_message(
+                commit_message, skip_detail=args.skip_detail, quiet=args.quiet
+            )
     except CommitlintException as ex:
         sys.stderr.write(f"{ex}\n")
         sys.exit(1)
