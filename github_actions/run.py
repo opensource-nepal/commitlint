@@ -16,6 +16,7 @@ EVENT_PULL_REQUEST = "pull_request"
 
 # Inputs
 INPUT_FAIL_ON_ERROR = "INPUT_FAIL_ON_ERROR"
+INPUT_VERBOSE = "INPUT_VERBOSE"
 
 # Status
 STATUS_SUCCESS = "success"
@@ -136,14 +137,20 @@ def _check_commits(from_hash: str, to_hash: str) -> None:
     """
     sys.stdout.write(f"Commit from {from_hash} to {to_hash}\n")
     try:
+        commands = [
+            "commitlint",
+            "--from-hash",
+            from_hash,
+            "--to-hash",
+            to_hash,
+        ]
+
+        verbose = _parse_boolean_input(_get_input(INPUT_VERBOSE))
+        if verbose:
+            commands.append("--verbose")
+
         output = subprocess.check_output(
-            [
-                "commitlint",
-                "--from-hash",
-                from_hash,
-                "--to-hash",
-                to_hash,
-            ],
+            commands,
             text=True,
         ).strip()
         sys.stdout.write(f"{output}\n")
