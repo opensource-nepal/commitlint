@@ -228,6 +228,10 @@ def main() -> None:
         console.error(f"{ex}")
         sys.exit(1)
 
+    except FileNotFoundError:
+        console.error(f"Error: file '{args.file}' not found")
+        sys.exit(1)
+
 
 if __name__ == "__main__":
     main()  # pragma: no cover
