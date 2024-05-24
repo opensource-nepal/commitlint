@@ -43,13 +43,12 @@ For more details, please refer to the Conventional Commits specification at http
 
    ```yaml
    repos:
-   ...
+    ...
 
-   - repo: https://github.com/opensource-nepal/commitlint
-       rev: v0.2.1
-       hooks:
-       - id: commitlint
-
+      - repo: https://github.com/opensource-nepal/commitlint
+        rev: v1
+        hooks:
+          - id: commitlint
    ...
    ```
 
@@ -70,7 +69,7 @@ If you have any existing workflows, add the following steps:
 steps:
     ...
     - name: Run commitlint
-    uses: opensource-nepal/commitlint@v0.2.1
+      uses: opensource-nepal/commitlint@v1
     ...
 ```
 
@@ -89,10 +88,8 @@ jobs:
     runs-on: ubuntu-latest
     name: Commitlint
     steps:
-      - uses: actions/checkout@v4
-
       - name: Run commitlint
-        uses: opensource-nepal/commitlint@v0.2.1
+        uses: opensource-nepal/commitlint@v1
 ```
 
 > **_NOTE:_** commitlint GitHub Actions will only be triggered by "push" or "pull_request" events.
