@@ -383,6 +383,22 @@ class TestCLIMain:
         main()
         assert config.verbose is True
 
+    @patch(
+        "commitlint.cli.get_args",
+        return_value=MagicMock(
+            file="path/to/non_existent_file.txt", skip_detail=False, quiet=False
+        ),
+    )
+    def test__main__with_missing_file(
+        self, _mock_get_args, _mock_output_error, mock_output_success
+    ):
+        mock_open().side_effect = FileNotFoundError(
+            2, "No such file or directory", "path/to/non_existent_file.txt"
+        )
+
+        with pytest.raises(SystemExit):
+            main()
+
 
 class TestCLIMainQuiet:
     # main : quiet (directly checking stdout and stderr)
