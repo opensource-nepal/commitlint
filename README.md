@@ -102,6 +102,7 @@ jobs:
 | #   | Name              | Type    | Default | Description                                                           |
 | --- | ----------------- | ------- | ------- | --------------------------------------------------------------------- |
 | 1   | **fail_on_error** | Boolean | true    | Determines whether the GitHub Action should fail if commitlint fails. |
+| 2   | **verbose**       | Boolean | true    | Verbose output.                                                       |
 
 #### GitHub Action Outputs
 
@@ -121,23 +122,23 @@ pip install commitlint
 ### Usage
 
 ```
-$ commitlint --help
-usage: commitlint [-h] [-V] [--file FILE] [--hash HASH] [--from-hash FROM_HASH] [--to-hash TO_HASH] [--skip-detail] [commit_message]
-
-Check if a commit message follows the conventional commit format.
+commitlint [-h] [-V] [--file FILE] [--hash HASH] [--from-hash FROM_HASH] [--to-hash TO_HASH] [--skip-detail] [-q | -v]
+           [commit_message]
 
 positional arguments:
-  commit_message        The commit message to be checked.
+  commit_message        The commit message to be checked
 
 optional arguments:
   -h, --help            show this help message and exit
   -V, --version         show program's version number and exit
-  --file FILE           Path to a file containing the commit message.
+  --file FILE           Path to a file containing the commit message
   --hash HASH           Commit hash
   --from-hash FROM_HASH
                         From commit hash
   --to-hash TO_HASH     To commit hash
   --skip-detail         Skip the detailed error message check
+  -q, --quiet           Ignore stdout and stderr
+  -v, --verbose         Verbose output
 ```
 
 ### Examples
@@ -172,6 +173,18 @@ Check commit message skipping the detail check:
 $ commitlint --skip-detail "chore: my commit message"
 # or
 $ commitlint --skip-detail --hash 9a8c08173
+```
+
+Run commitlint in quiet mode:
+
+```shell
+$ commitlint --quiet "chore: my commit message"
+```
+
+Run commitlint in verbose mode:
+
+```shell
+$ commitlint --verbose "chore: my commit message"
 ```
 
 Version check:

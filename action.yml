@@ -1,27 +1,31 @@
-name: "Conventional Commitlint"
-description: "A GitHub Action to check conventional commit message"
+name: 'Conventional Commitlint'
+description: 'A GitHub Action to check conventional commit message'
 inputs:
   fail_on_error:
     description: Whether to fail the workflow if commit messages don't follow conventions.
     default: 'true'
     required: false
+  verbose:
+    description: Verbose output.
+    default: 'false'
+    required: false
 outputs:
-    status:
-      description: Status
-      value: ${{ steps.commitlint.outputs.status }}
-    exit_code:
-      description: Exit Code
-      value: ${{ steps.commitlint.outputs.exit_code }}
+  status:
+    description: Status
+    value: ${{ steps.commitlint.outputs.status }}
+  exit_code:
+    description: Exit Code
+    value: ${{ steps.commitlint.outputs.exit_code }}
 branding:
-  color: "red"
-  icon: "git-commit"
+  color: 'red'
+  icon: 'git-commit'
 runs:
-  using: "composite"
+  using: 'composite'
   steps:
     - name: Install Python
       uses: actions/setup-python@v5
       with:
-        python-version: "3.8"
+        python-version: '3.8'
 
     - name: Install Commitlint
       run: python -m pip install -e ${{ github.action_path }}
@@ -59,3 +63,4 @@ runs:
       shell: bash
       env:
         INPUT_FAIL_ON_ERROR: ${{ inputs.fail_on_error }}
+        INPUT_VERBOSE: ${{ inputs.verbose }}

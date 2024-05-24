@@ -16,3 +16,5 @@ jobs:
         uses: ./ # Uses an action in the root directory
         # or use a released GitHub Action
         # uses: opensource-nepal/commitlint@v0.2.1
+        with:
+          verbose: true
