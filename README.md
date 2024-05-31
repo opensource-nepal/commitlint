@@ -43,13 +43,12 @@ For more details, please refer to the Conventional Commits specification at http
 
    ```yaml
    repos:
-    ...
-
+      ...
       - repo: https://github.com/opensource-nepal/commitlint
-        rev: v1
+        rev: v1.0.0
         hooks:
           - id: commitlint
-   ...
+      ...
    ```
 
 2. Install the `commit-msg` hook in your project repo:
@@ -60,7 +59,7 @@ For more details, please refer to the Conventional Commits specification at http
 
 > **_NOTE:_** Installing using only `pre-commit install` will not work.
 
-### For github-actions
+### For GitHub Actions
 
 If you have any existing workflows, add the following steps:
 
