@@ -1,23 +1,19 @@
 on:
   push:
-    branches:
-      - main
-  workflow_dispatch:
-
-permissions:
-  id-token: write # for PYPI release
+    branches: ['main']
 
 name: release-please
 
 jobs:
   release-please:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write # for PYPI release
+
     steps:
       - name: Release
         id: release
-        uses: google-github-actions/release-please-action@v4
-        with:
-          token: ${{ secrets.BOT_TOKEN }}
+        uses: google-github-actions/release-please-action@e4dc86ba9405554aeba3c6bb2d169500e7d3b4ee # v4.1.1
 
       - uses: actions/checkout@v3
         if: ${{ steps.release.outputs.release_created }}
@@ -40,4 +36,4 @@ jobs:
 
       - name: Publish package
         if: ${{ steps.release.outputs.release_created }}
-        uses: pypa/gh-action-pypi-publish@v1.8.14
+        uses: pypa/gh-action-pypi-publish@ec4db0b4ddc65acdf4bff5fa45ac92d78b56bdf0 # v1.9.0
