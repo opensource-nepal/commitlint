@@ -13,6 +13,7 @@ from event import GithubEvent
 # Events
 EVENT_PUSH = "push"
 EVENT_PULL_REQUEST = "pull_request"
+EVENT_PULL_REQUEST_TARGET = "pull_request_target"
 
 # Inputs
 INPUT_FAIL_ON_ERROR = "INPUT_FAIL_ON_ERROR"
@@ -175,6 +176,8 @@ def main() -> None:
     if event.event_name == EVENT_PUSH:
         _handle_push_event(event)
     elif event.event_name == EVENT_PULL_REQUEST:
+        _handle_pr_event(event)
+    elif event.event_name == EVENT_PULL_REQUEST_TARGET:
         _handle_pr_event(event)
     elif event.event_name is None:
         sys.stdout.write("No any events, skipping\n")
