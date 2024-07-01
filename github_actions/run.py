@@ -175,9 +175,7 @@ def main() -> None:
 
     if event.event_name == EVENT_PUSH:
         _handle_push_event(event)
-    elif event.event_name == EVENT_PULL_REQUEST:
-        _handle_pr_event(event)
-    elif event.event_name == EVENT_PULL_REQUEST_TARGET:
+    elif event.event_name in {EVENT_PULL_REQUEST, EVENT_PULL_REQUEST_TARGET}:
         _handle_pr_event(event)
     elif event.event_name is None:
         sys.stdout.write("No any events, skipping\n")
