@@ -9,6 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       id-token: write # for PYPI release
+      contents: write
+      pull-requests: write
 
     steps:
       - name: Release
