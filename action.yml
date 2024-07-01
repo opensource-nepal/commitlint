@@ -23,12 +23,12 @@ runs:
   using: 'composite'
   steps:
     - name: Install Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v5.1.0
       with:
         python-version: '3.8'
 
     - name: Install Commitlint
-      run: python -m pip install -e ${{ github.action_path }}
+      run: python -m pip install --disable-pip-version-check -e ${{ github.action_path }}
       shell: bash
 
     # checkout to the source code
@@ -40,9 +40,10 @@ runs:
         echo "count=$(echo '${{ toJson(github.event.commits) }}' | jq '. | length')" \
           >> $GITHUB_OUTPUT
       shell: bash
+
     - name: Checkout to pushed commits
       if: github.event_name == 'push'
-      uses: actions/checkout@v4
+      uses: actions/checkout@v4.1.7
       with:
         ref: ${{ github.sha }}
         fetch-depth: ${{ steps.push_commit_count.outputs.count }}
@@ -50,7 +51,7 @@ runs:
     # for pull_request event
     - name: Checkout to PR source branch
       if: github.event_name == 'pull_request'
-      uses: actions/checkout@v4
+      uses: actions/checkout@v4.1.7
       with:
         ref: ${{ github.event.pull_request.head.sha }}
         fetch-depth: ${{ github.event.pull_request.commits }}
