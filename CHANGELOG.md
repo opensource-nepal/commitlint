@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## [1.1.0](https://github.com/opensource-nepal/commitlint/compare/v1.0.0...v1.1.0) (2024-07-02)
+
+
+### Features
+
+* support pull_request_target events ([#52](https://github.com/opensource-nepal/commitlint/issues/52)) ([62e1128](https://github.com/opensource-nepal/commitlint/commit/62e11285d5628dff5f67645d1c718e1276478ecb))
+
+
+### Bug Fixes
+
+* security updates on commitlint action and workflows ([#48](https://github.com/opensource-nepal/commitlint/issues/48)) ([b98c73f](https://github.com/opensource-nepal/commitlint/commit/b98c73fb68f11b66ec8d3f227c6b129598c28726))
+
 ## [1.0.0](https://github.com/opensource-nepal/commitlint/compare/v0.2.1...v1.0.0) (2024-05-24)
 
 
