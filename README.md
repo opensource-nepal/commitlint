@@ -91,7 +91,7 @@ jobs:
         uses: opensource-nepal/commitlint@v1
 ```
 
-> **_NOTE:_** commitlint GitHub Actions will only be triggered by "push" or "pull_request" events.
+> **_NOTE:_** commitlint GitHub Actions will only be triggered by "push", "pull_request", or "pull_request_target" events. The difference between "pull_request" and "pull_request_target" is that "pull_request" is more secure for public repos while "pull_request_target" is necessary for private repos.
 
 #### GitHub Action Inputs
 
