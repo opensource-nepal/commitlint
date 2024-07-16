@@ -24,5 +24,6 @@ IGNORE_COMMIT_PATTERNS = (
     r"^(Merged (.*?)(in|into) (.*)|Merged PR (.*): (.*))$|"
     r"^Merge remote-tracking branch(\s*)(.*)$|"
     r"^Automatic merge(.*)$|"
-    r"^Auto-merged (.*?) into (.*)$"
+    r"^Auto-merged (.*?) into (.*)$|"
+    r"[Bb]ump [^\s]+ from [^\s]+ to [^\s]+"
 )
