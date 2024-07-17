@@ -24,10 +24,29 @@ def is_ignored(commit_message: str) -> bool:
     return bool(re.match(IGNORE_COMMIT_PATTERNS, commit_message))
 
 
-def remove_comments(msg: str) -> str:
+def remove_comments(commit_message: str) -> str:
     """Removes comments from the commit message.
 
-    For `git commit --verbose`, excluding the diff generated message,
+    Args:
+        commit_message(str): The commit message to remove comments.
+
+    Returns:
+        str: The commit message without comments.
+    """
+    commit_message = remove_diff_from_commit_message(commit_message)
+
+    lines: List[str] = []
+    for line in commit_message.split("\n"):
+        if not line.startswith("#"):
+            lines.append(line)
+
+    return "\n".join(lines)
+
+
+def remove_diff_from_commit_message(commit_message: str) -> str:
+    """Removes commit diff from the commit message.
+
+    For `git commit --verbose`, removing the diff generated message,
     for example:
 
     ```bash
@@ -40,18 +59,10 @@ def remove_comments(msg: str) -> str:
     ```
 
     Args:
-        msg(str): The commit message to remove comments.
+        commit_message (str): The commit message to remove diff.
 
     Returns:
-        str: The commit message without comments.
+        str: The commit message without diff.
     """
-
-    lines: List[str] = []
-    for line in msg.split("\n"):
-        if "# ------------------------ >8 ------------------------" in line:
-            # ignoring all the verbose message below this line
-            break
-        if not line.startswith("#"):
-            lines.append(line)
-
-    return "\n".join(lines)
+    verbose_commit_separator = "# ------------------------ >8 ------------------------"
+    return commit_message.split(verbose_commit_separator)[0].strip()

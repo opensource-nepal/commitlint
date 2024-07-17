@@ -193,6 +193,20 @@ class TestCLIMain:
         "commitlint.cli.get_args",
         return_value=MagicMock(file="path/to/file.txt", skip_detail=False, quiet=False),
     )
+    @patch(
+        "builtins.open",
+        mock_open(read_data="feat: valid commit message 2\n#this is a comment"),
+    )
+    def test__main__valid_commit_message_and_comments_with_file(
+        self, _mock_get_args, _mock_output_error, mock_output_success
+    ):
+        main()
+        mock_output_success.assert_called_with(f"{VALIDATION_SUCCESSFUL}")
+
+    @patch(
+        "commitlint.cli.get_args",
+        return_value=MagicMock(file="path/to/file.txt", skip_detail=False, quiet=False),
+    )
     @patch("builtins.open", mock_open(read_data="Invalid commit message 2"))
     def test__main__invalid_commit_message_with_file(
         self, _mock_get_args, mock_output_error, _mock_output_success

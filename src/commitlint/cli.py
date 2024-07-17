@@ -24,7 +24,7 @@ from .config import config
 from .exceptions import CommitlintException
 from .git_helpers import get_commit_message_of_hash, get_commit_messages_of_hash_range
 from .linter import lint_commit_message
-from .linter.utils import remove_comments
+from .linter.utils import remove_diff_from_commit_message
 from .messages import VALIDATION_FAILED, VALIDATION_SUCCESSFUL
 
 
@@ -93,9 +93,7 @@ def get_args() -> argparse.Namespace:
 
 
 def _show_errors(
-    commit_message: str,
-    errors: List[str],
-    skip_detail: bool = False,
+    commit_message: str, errors: List[str], skip_detail: bool = False
 ) -> None:
     """
     Display a formatted error message for a list of errors.
@@ -104,10 +102,10 @@ def _show_errors(
         commit_message (str): The commit message to display.
         errors (List[str]): A list of error messages to be displayed.
         skip_detail (bool): Whether to skip the detailed error message.
-
     """
     error_count = len(errors)
-    commit_message = remove_comments(commit_message)
+
+    commit_message = remove_diff_from_commit_message(commit_message)
 
     console.error(f"⧗ Input:\n{commit_message}\n")
 
@@ -141,24 +139,28 @@ def _get_commit_message_from_file(filepath: str) -> str:
         return commit_message
 
 
-def _handle_commit_message(commit_message: str, skip_detail: bool) -> None:
+def _handle_commit_message(
+    commit_message: str, skip_detail: bool, strip_comments: bool = False
+) -> None:
     """
     Handles a single commit message, checks its validity, and prints the result.
 
     Args:
         commit_message (str): The commit message to be handled.
         skip_detail (bool): Whether to skip the detailed error linting.
+        strip_comments (bool, optional): Whether to remove comments from the
+            commit message (default is False).
 
     Raises:
         SystemExit: If the commit message is invalid.
     """
-    success, errors = lint_commit_message(commit_message, skip_detail=skip_detail)
+    success, errors = lint_commit_message(commit_message, skip_detail, strip_comments)
 
     if success:
         console.success(VALIDATION_SUCCESSFUL)
         return
 
-    _show_errors(commit_message, errors, skip_detail=skip_detail)
+    _show_errors(commit_message, errors, skip_detail)
     sys.exit(1)
 
 
@@ -177,13 +179,13 @@ def _handle_multiple_commit_messages(
     has_error = False
 
     for commit_message in commit_messages:
-        success, errors = lint_commit_message(commit_message, skip_detail=skip_detail)
+        success, errors = lint_commit_message(commit_message, skip_detail)
         if success:
             console.verbose("lint success")
             continue
 
         has_error = True
-        _show_errors(commit_message, errors, skip_detail=skip_detail)
+        _show_errors(commit_message, errors, skip_detail)
         console.error("")
 
     if has_error:
@@ -207,7 +209,9 @@ def main() -> None:
         if args.file:
             console.verbose("checking commit from file")
             commit_message = _get_commit_message_from_file(args.file)
-            _handle_commit_message(commit_message, skip_detail=args.skip_detail)
+            _handle_commit_message(
+                commit_message, skip_detail=args.skip_detail, strip_comments=True
+            )
         elif args.hash:
             console.verbose("checking commit from hash")
             commit_message = get_commit_message_of_hash(args.hash)

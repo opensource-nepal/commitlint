@@ -44,13 +44,6 @@ LINTER_FIXTURE_PARAMS: Tuple[Tuple[str, bool, List[str], List[str]], ...] = (
     ("feat: add new feature\n\nthis is body\n\ntest", True, []),
     ("feat: add new feature\n", True, []),
     ("build(deps-dev): bump @babel/traverse from 7.22.17 to 7.24.0", True, []),
-    ("feat(scope): add new feature\n#this is a comment", True, []),
-    (
-        "fix: fixed a bug\n\nthis is body\n"
-        "# ------------------------ >8 ------------------------\nDiff message",
-        True,
-        [],
-    ),
     ("feat!: breaking feature", True, []),
     # ignored commits (success)
     ("Merge pull request #123", True, []),
