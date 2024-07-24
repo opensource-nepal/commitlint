@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## [1.2.0](https://github.com/opensource-nepal/commitlint/compare/v1.1.0...v1.2.0) (2024-07-24)
+
+
+### Features
+
+* allow bump commits ([#55](https://github.com/opensource-nepal/commitlint/issues/55)) ([bb8a3b7](https://github.com/opensource-nepal/commitlint/commit/bb8a3b74134f42a48acec18ab87e6a0293c07e84))
+
+
+### Bug Fixes
+
+* handle commit message starting with # ([#59](https://github.com/opensource-nepal/commitlint/issues/59)) ([ea7683f](https://github.com/opensource-nepal/commitlint/commit/ea7683f2cf265090fda7ddfadfc9853caa05e546))
+
 ## [1.1.0](https://github.com/opensource-nepal/commitlint/compare/v1.0.0...v1.1.0) (2024-07-02)
 
 
