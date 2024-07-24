@@ -66,6 +66,14 @@ def get_args() -> argparse.Namespace:
         action="store_true",
         help="Skip the detailed error message check",
     )
+    # --hide-input: specifically created for Github Actions
+    # and is ignored from documentation.
+    parser.add_argument(
+        "--hide-input",
+        action="store_true",
+        help="Hide input from stdout",
+        default=False,
+    )
 
     output_group = parser.add_mutually_exclusive_group(required=False)
     # --quiet option is optional
@@ -93,7 +101,10 @@ def get_args() -> argparse.Namespace:
 
 
 def _show_errors(
-    commit_message: str, errors: List[str], skip_detail: bool = False
+    commit_message: str,
+    errors: List[str],
+    skip_detail: bool = False,
+    hide_input: bool = False,
 ) -> None:
     """
     Display a formatted error message for a list of errors.
@@ -102,12 +113,14 @@ def _show_errors(
         commit_message (str): The commit message to display.
         errors (List[str]): A list of error messages to be displayed.
         skip_detail (bool): Whether to skip the detailed error message.
+        hide_input (bool): Hide input from stdout/stderr.
     """
     error_count = len(errors)
 
     commit_message = remove_diff_from_commit_message(commit_message)
 
-    console.error(f"⧗ Input:\n{commit_message}\n")
+    if not hide_input:
+        console.error(f"⧗ Input:\n{commit_message}\n")
 
     if skip_detail:
         console.error(VALIDATION_FAILED)
@@ -140,7 +153,10 @@ def _get_commit_message_from_file(filepath: str) -> str:
 
 
 def _handle_commit_message(
-    commit_message: str, skip_detail: bool, strip_comments: bool = False
+    commit_message: str,
+    skip_detail: bool,
+    hide_input: bool,
+    strip_comments: bool = False,
 ) -> None:
     """
     Handles a single commit message, checks its validity, and prints the result.
@@ -148,6 +164,7 @@ def _handle_commit_message(
     Args:
         commit_message (str): The commit message to be handled.
         skip_detail (bool): Whether to skip the detailed error linting.
+        hide_input (bool): Hide input from stdout/stderr.
         strip_comments (bool, optional): Whether to remove comments from the
             commit message (default is False).
 
@@ -160,12 +177,12 @@ def _handle_commit_message(
         console.success(VALIDATION_SUCCESSFUL)
         return
 
-    _show_errors(commit_message, errors, skip_detail)
+    _show_errors(commit_message, errors, skip_detail, hide_input)
     sys.exit(1)
 
 
 def _handle_multiple_commit_messages(
-    commit_messages: List[str], skip_detail: bool
+    commit_messages: List[str], skip_detail: bool, hide_input: bool
 ) -> None:
     """
     Handles multiple commit messages, checks their validity, and prints the result.
@@ -173,6 +190,8 @@ def _handle_multiple_commit_messages(
     Args:
         commit_messages (List[str]): List of commit messages to be handled.
         skip_detail (bool): Whether to skip the detailed error linting.
+        hide_input (bool): Hide input from stdout/stderr.
+
     Raises:
         SystemExit: If any of the commit messages is invalid.
     """
@@ -185,7 +204,7 @@ def _handle_multiple_commit_messages(
             continue
 
         has_error = True
-        _show_errors(commit_message, errors, skip_detail)
+        _show_errors(commit_message, errors, skip_detail, hide_input)
         console.error("")
 
     if has_error:
@@ -207,27 +226,36 @@ def main() -> None:
     console.verbose("starting commitlint")
     try:
         if args.file:
-            console.verbose("checking commit from file")
+            console.verbose("commit message source: file")
             commit_message = _get_commit_message_from_file(args.file)
             _handle_commit_message(
-                commit_message, skip_detail=args.skip_detail, strip_comments=True
+                commit_message,
+                skip_detail=args.skip_detail,
+                hide_input=args.hide_input,
+                strip_comments=True,
             )
         elif args.hash:
-            console.verbose("checking commit from hash")
+            console.verbose("commit message source: hash")
             commit_message = get_commit_message_of_hash(args.hash)
-            _handle_commit_message(commit_message, skip_detail=args.skip_detail)
+            _handle_commit_message(
+                commit_message, skip_detail=args.skip_detail, hide_input=args.hide_input
+            )
         elif args.from_hash:
-            console.verbose("checking commit from hash range")
+            console.verbose("commit message source: hash range")
             commit_messages = get_commit_messages_of_hash_range(
                 args.from_hash, args.to_hash
             )
             _handle_multiple_commit_messages(
-                commit_messages, skip_detail=args.skip_detail
+                commit_messages,
+                skip_detail=args.skip_detail,
+                hide_input=args.hide_input,
             )
         else:
-            console.verbose("checking commit message")
+            console.verbose("commit message source: direct message")
             commit_message = args.commit_message.strip()
-            _handle_commit_message(commit_message, skip_detail=args.skip_detail)
+            _handle_commit_message(
+                commit_message, skip_detail=args.skip_detail, hide_input=args.hide_input
+            )
     except CommitlintException as ex:
         console.error(f"{ex}")
         sys.exit(1)

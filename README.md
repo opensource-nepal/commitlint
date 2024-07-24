@@ -98,10 +98,11 @@ jobs:
 
 #### GitHub Action Inputs
 
-| #   | Name              | Type    | Default | Description                                                           |
-| --- | ----------------- | ------- | ------- | --------------------------------------------------------------------- |
-| 1   | **fail_on_error** | Boolean | true    | Determines whether the GitHub Action should fail if commitlint fails. |
-| 2   | **verbose**       | Boolean | false   | Verbose output.                                                       |
+| #   | Name              | Type    | Default                | Description                                                           |
+| --- | ----------------- | ------- | ---------------------- | --------------------------------------------------------------------- |
+| 1   | **fail_on_error** | Boolean | `true`                 | Determines whether the GitHub Action should fail if commitlint fails. |
+| 2   | **verbose**       | Boolean | `false`                | Verbose output.                                                       |
+| 3   | **token**         | String  | `secrets.GITHUB_TOKEN` | Github Token for fetching commits using Github API.                   |
 
 #### GitHub Action Outputs
 

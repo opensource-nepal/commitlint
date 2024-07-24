@@ -1,7 +1,7 @@
 # type: ignore
 # pylint: disable=all
 
-from unittest.mock import MagicMock, call, mock_open, patch
+from unittest.mock import Mock, call, mock_open, patch
 
 import pytest
 
@@ -15,12 +15,30 @@ from commitlint.messages import (
 )
 
 
+class ArgsMock(Mock):
+    """
+    Args Mock, used for mocking CLI arguments.
+    Main purpose: returns `None` instead of `Mock` if attribute is not assigned.
+
+    ```
+    arg = ArgsMock(value1=10)
+    arg.value1 # 10
+    arg.value2 # None
+    ```
+    """
+
+    def __getattr__(self, name):
+        if name in self.__dict__:
+            return self.__dict__[name]
+        return None
+
+
 class TestCLIGetArgs:
     # get_args
 
     @patch(
         "argparse.ArgumentParser.parse_args",
-        return_value=MagicMock(
+        return_value=ArgsMock(
             commit_message="commit message",
             file=None,
             hash=None,
@@ -38,7 +56,7 @@ class TestCLIGetArgs:
 
     @patch(
         "argparse.ArgumentParser.parse_args",
-        return_value=MagicMock(file="path/to/file.txt"),
+        return_value=ArgsMock(file="path/to/file.txt"),
     )
     def test__get_args__with_file(self, *_):
         args = get_args()
@@ -46,7 +64,7 @@ class TestCLIGetArgs:
 
     @patch(
         "argparse.ArgumentParser.parse_args",
-        return_value=MagicMock(hash="commit_hash", file=None),
+        return_value=ArgsMock(hash="commit_hash", file=None),
     )
     def test__get_args__with_hash(self, *_):
         args = get_args()
@@ -55,7 +73,7 @@ class TestCLIGetArgs:
 
     @patch(
         "argparse.ArgumentParser.parse_args",
-        return_value=MagicMock(from_hash="from_commit_hash", file=None, hash=None),
+        return_value=ArgsMock(from_hash="from_commit_hash", file=None, hash=None),
     )
     def test__get_args__with_from_hash(self, *_):
         args = get_args()
@@ -65,7 +83,7 @@ class TestCLIGetArgs:
 
     @patch(
         "argparse.ArgumentParser.parse_args",
-        return_value=MagicMock(
+        return_value=ArgsMock(
             from_hash="from_commit_hash", to_hash="to_commit_hash", file=None, hash=None
         ),
     )
@@ -78,11 +96,19 @@ class TestCLIGetArgs:
 
     @patch(
         "argparse.ArgumentParser.parse_args",
-        return_value=MagicMock(skip_detail=True),
+        return_value=ArgsMock(skip_detail=True),
     )
     def test__get_args__with_skip_detail(self, *_):
         args = get_args()
         assert args.skip_detail is True
+
+    @patch(
+        "argparse.ArgumentParser.parse_args",
+        return_value=ArgsMock(hide_input=True),
+    )
+    def test__get_args__with_hide_input(self, *_):
+        args = get_args()
+        assert args.hide_input is True
 
 
 @patch("commitlint.console.success")
@@ -92,15 +118,7 @@ class TestCLIMain:
 
     @patch(
         "commitlint.cli.get_args",
-        return_value=MagicMock(
-            commit_message="feat: valid commit message",
-            file=None,
-            hash=None,
-            from_hash=None,
-            skip_detail=False,
-            quiet=False,
-            verbose=False,
-        ),
+        return_value=ArgsMock(commit_message="feat: valid commit message"),
     )
     def test__main__valid_commit_message(
         self, _mock_get_args, _mock_output_error, mock_output_success
@@ -110,14 +128,8 @@ class TestCLIMain:
 
     @patch(
         "commitlint.cli.get_args",
-        return_value=MagicMock(
-            commit_message="feat: valid commit message",
-            file=None,
-            hash=None,
-            from_hash=None,
-            skip_detail=True,
-            quiet=False,
-            verbose=False,
+        return_value=ArgsMock(
+            commit_message="feat: valid commit message", skip_detail=True
         ),
     )
     def test__main__valid_commit_message_using_skip_detail(
@@ -128,15 +140,7 @@ class TestCLIMain:
 
     @patch(
         "commitlint.cli.get_args",
-        return_value=MagicMock(
-            commit_message="Invalid commit message",
-            file=None,
-            hash=None,
-            from_hash=None,
-            skip_detail=False,
-            quiet=False,
-            verbose=False,
-        ),
+        return_value=ArgsMock(commit_message="Invalid commit message"),
     )
     def test__main__invalid_commit_message(
         self, _mock_get_args, mock_output_error, _mock_output_success
@@ -153,14 +157,8 @@ class TestCLIMain:
 
     @patch(
         "commitlint.cli.get_args",
-        return_value=MagicMock(
-            commit_message="Invalid commit message",
-            file=None,
-            hash=None,
-            from_hash=None,
-            skip_detail=True,
-            quiet=False,
-            verbose=False,
+        return_value=ArgsMock(
+            commit_message="Invalid commit message", skip_detail=True
         ),
     )
     def test__main__invalid_commit_message_using_skip_detail(
@@ -176,11 +174,27 @@ class TestCLIMain:
             ]
         )
 
+    @patch(
+        "commitlint.cli.get_args",
+        return_value=ArgsMock(commit_message="Invalid commit message", hide_input=True),
+    )
+    def test__main__invalid_commit_message_with_hide_input_True(
+        self, _mock_get_args, mock_output_error, _mock_output_success
+    ):
+        with pytest.raises(SystemExit):
+            main()
+        mock_output_error.assert_has_calls(
+            [
+                call("✖ Found 1 error(s)."),
+                call(f"- {INCORRECT_FORMAT_ERROR}"),
+            ]
+        )
+
     # main: file
 
     @patch(
         "commitlint.cli.get_args",
-        return_value=MagicMock(file="path/to/file.txt", skip_detail=False, quiet=False),
+        return_value=ArgsMock(file="path/to/file.txt"),
     )
     @patch("builtins.open", mock_open(read_data="feat: valid commit message"))
     def test__main__valid_commit_message_with_file(
@@ -191,7 +205,7 @@ class TestCLIMain:
 
     @patch(
         "commitlint.cli.get_args",
-        return_value=MagicMock(file="path/to/file.txt", skip_detail=False, quiet=False),
+        return_value=ArgsMock(file="path/to/file.txt"),
     )
     @patch(
         "builtins.open",
@@ -205,7 +219,7 @@ class TestCLIMain:
 
     @patch(
         "commitlint.cli.get_args",
-        return_value=MagicMock(file="path/to/file.txt", skip_detail=False, quiet=False),
+        return_value=ArgsMock(file="path/to/file.txt"),
     )
     @patch("builtins.open", mock_open(read_data="Invalid commit message 2"))
     def test__main__invalid_commit_message_with_file(
@@ -226,9 +240,7 @@ class TestCLIMain:
 
     @patch(
         "commitlint.cli.get_args",
-        return_value=MagicMock(
-            file=None, hash="commit_hash", skip_detail=False, quiet=False
-        ),
+        return_value=ArgsMock(hash="commit_hash"),
     )
     @patch("commitlint.cli.get_commit_message_of_hash")
     def test__main__valid_commit_message_with_hash(
@@ -244,9 +256,7 @@ class TestCLIMain:
 
     @patch(
         "commitlint.cli.get_args",
-        return_value=MagicMock(
-            file=None, hash="commit_hash", skip_detail=False, quiet=False
-        ),
+        return_value=ArgsMock(hash="commit_hash"),
     )
     @patch("commitlint.cli.get_commit_message_of_hash")
     def test__main__invalid_commit_message_with_hash(
@@ -273,15 +283,7 @@ class TestCLIMain:
 
     @patch(
         "commitlint.cli.get_args",
-        return_value=MagicMock(
-            file=None,
-            hash=None,
-            from_hash="start_commit_hash",
-            to_hash="end_commit_hash",
-            skip_detail=False,
-            quiet=False,
-            verbose=False,
-        ),
+        return_value=ArgsMock(from_hash="start_commit_hash", to_hash="end_commit_hash"),
     )
     @patch("commitlint.cli.get_commit_messages_of_hash_range")
     def test__main__valid_commit_message_with_hash_range(
@@ -300,14 +302,8 @@ class TestCLIMain:
 
     @patch(
         "commitlint.cli.get_args",
-        return_value=MagicMock(
-            file=None,
-            hash=None,
-            from_hash="invalid_start_hash",
-            to_hash="end_commit_hash",
-            skip_detail=False,
-            quiet=False,
-            verbose=False,
+        return_value=ArgsMock(
+            from_hash="invalid_start_hash", to_hash="end_commit_hash"
         ),
     )
     @patch("commitlint.cli.get_commit_messages_of_hash_range")
@@ -330,9 +326,7 @@ class TestCLIMain:
 
     @patch(
         "argparse.ArgumentParser.parse_args",
-        return_value=MagicMock(
-            commit_message="feat: commit message", file=None, hash=None, from_hash=None
-        ),
+        return_value=ArgsMock(commit_message="feat: commit message"),
     )
     @patch(
         "commitlint.cli.lint_commit_message",
@@ -355,15 +349,7 @@ class TestCLIMain:
 
     @patch(
         "commitlint.cli.get_args",
-        return_value=MagicMock(
-            commit_message="feat: test commit",
-            file=None,
-            hash=None,
-            from_hash=None,
-            skip_detail=False,
-            quiet=True,
-            verbose=False,
-        ),
+        return_value=ArgsMock(commit_message="feat: test commit", quiet=True),
     )
     def test__main__sets_config_for_quiet(
         self,
@@ -378,15 +364,7 @@ class TestCLIMain:
 
     @patch(
         "commitlint.cli.get_args",
-        return_value=MagicMock(
-            commit_message="feat: test commit",
-            file=None,
-            hash=None,
-            from_hash=None,
-            skip_detail=False,
-            quiet=False,
-            verbose=True,
-        ),
+        return_value=ArgsMock(commit_message="feat: test commit", verbose=True),
     )
     def test__main__sets_config_for_verbose(
         self,
@@ -399,9 +377,7 @@ class TestCLIMain:
 
     @patch(
         "commitlint.cli.get_args",
-        return_value=MagicMock(
-            file="path/to/non_existent_file.txt", skip_detail=False, quiet=False
-        ),
+        return_value=ArgsMock(file="path/to/non_existent_file.txt"),
     )
     def test__main__with_missing_file(
         self, _mock_get_args, _mock_output_error, mock_output_success
@@ -419,15 +395,7 @@ class TestCLIMainQuiet:
 
     @patch(
         "commitlint.cli.get_args",
-        return_value=MagicMock(
-            commit_message="Invalid commit message",
-            file=None,
-            hash=None,
-            from_hash=None,
-            skip_detail=False,
-            quiet=True,
-            verbose=False,
-        ),
+        return_value=ArgsMock(commit_message="Invalid commit message", quiet=True),
     )
     @patch("sys.stdout.write")
     @patch("sys.stderr.write")
@@ -442,15 +410,7 @@ class TestCLIMainQuiet:
 
     @patch(
         "commitlint.cli.get_args",
-        return_value=MagicMock(
-            commit_message="feat: valid commit message",
-            file=None,
-            hash=None,
-            from_hash=None,
-            skip_detail=False,
-            quiet=True,
-            verbose=False,
-        ),
+        return_value=ArgsMock(commit_message="feat: valid commit message", quiet=True),
     )
     @patch("sys.stdout.write")
     @patch("sys.stderr.write")
@@ -463,14 +423,8 @@ class TestCLIMainQuiet:
 
     @patch(
         "commitlint.cli.get_args",
-        return_value=MagicMock(
-            file=None,
-            hash=None,
-            from_hash="start_commit_hash",
-            to_hash="end_commit_hash",
-            skip_detail=False,
-            quiet=True,
-            verbose=False,
+        return_value=ArgsMock(
+            from_hash="start_commit_hash", to_hash="end_commit_hash", quiet=True
         ),
     )
     @patch("commitlint.cli.get_commit_messages_of_hash_range")
@@ -487,14 +441,8 @@ class TestCLIMainQuiet:
 
     @patch(
         "commitlint.cli.get_args",
-        return_value=MagicMock(
-            file=None,
-            hash=None,
-            from_hash="start_commit_hash",
-            to_hash="end_commit_hash",
-            skip_detail=False,
-            quiet=True,
-            verbose=False,
+        return_value=ArgsMock(
+            from_hash="start_commit_hash", to_hash="end_commit_hash", quiet=True
         ),
     )
     @patch("commitlint.cli.get_commit_messages_of_hash_range")
