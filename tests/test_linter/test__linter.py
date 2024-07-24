@@ -1,14 +1,14 @@
 # type: ignore
 # pylint: disable=all
 
+from unittest.mock import patch
+
 import pytest
 
 from commitlint.constants import COMMIT_HEADER_MAX_LENGTH
 from commitlint.linter import lint_commit_message
-from commitlint.messages import (
-    HEADER_LENGTH_ERROR,
-    INCORRECT_FORMAT_ERROR,
-)
+from commitlint.messages import HEADER_LENGTH_ERROR, INCORRECT_FORMAT_ERROR
+
 from ..fixtures.linter import LINTER_FIXTURE_PARAMS
 
 
@@ -28,6 +28,23 @@ def test__lint_commit_message__skip_detail(fixture_data):
     commit_message, expected_success, _ = fixture_data
     success, _ = lint_commit_message(commit_message, skip_detail=True)
     assert success == expected_success
+
+
+def test__lint_commit_message__remove_comments_if_strip_comments_is_True():
+    commit_message = "feat(scope): add new feature\n#this is a comment"
+    success, errors = lint_commit_message(commit_message, strip_comments=True)
+    assert success is True
+    assert errors == []
+
+
+@patch("commitlint.linter._linter.remove_comments")
+def test__lint_commit_message__calls_remove_comments_if_strip_comments_is_True(
+    mock_remove_comments,
+):
+    commit_message = "feat(scope): add new feature"
+    mock_remove_comments.return_value = commit_message
+    lint_commit_message(commit_message, strip_comments=True)
+    mock_remove_comments.assert_called_once()
 
 
 def test__lint_commit_message__skip_detail_returns_header_length_error_message():

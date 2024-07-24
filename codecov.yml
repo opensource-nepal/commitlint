@@ -2,10 +2,3 @@
 
 # Disabling comments
 comment: false
-
-# Disabling Github checks
-github_checks: false
-coverage:
-  status:
-    project: off
-    patch: off

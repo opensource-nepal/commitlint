@@ -16,7 +16,7 @@ from .validators import (
 
 
 def lint_commit_message(
-    commit_message: str, skip_detail: bool = False
+    commit_message: str, skip_detail: bool = False, strip_comments: bool = False
 ) -> Tuple[bool, List[str]]:
     """
     Lints a commit message.
@@ -25,6 +25,8 @@ def lint_commit_message(
         commit_message (str): The commit message to be linted.
         skip_detail (bool, optional): Whether to skip the detailed error linting
             (default is False).
+        strip_comments (bool, optional): Whether to remove comments from the
+            commit message (default is False).
 
     Returns:
         Tuple[bool, List[str]]: Returns success as a first element and list of errors
@@ -35,8 +37,9 @@ def lint_commit_message(
 
     # perform processing and pre checks
     # removing unnecessary commit comments
-    console.verbose("removing comments from the commit message")
-    commit_message = remove_comments(commit_message)
+    if strip_comments:
+        console.verbose("removing comments from the commit message")
+        commit_message = remove_comments(commit_message)
 
     # checking if commit message should be ignored
     console.verbose("checking if the commit message is in ignored list")

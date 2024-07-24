@@ -57,7 +57,10 @@ For more details, please refer to the Conventional Commits specification at http
    pre-commit install --hook-type commit-msg
    ```
 
-> **_NOTE:_** Installing using only `pre-commit install` will not work.
+   Installing using only `pre-commit install` will not work.
+
+> **_NOTE:_** Avoid using commit messages that start with '#'.
+> This might result in unexpected behavior with commitlint.
 
 ### For GitHub Actions
 
@@ -150,6 +153,9 @@ Check commit message from file:
 ```shell
 $ commitlint --file /foo/bar/commit-message.txt
 ```
+
+> **_NOTE:_** For `--file` option, avoid using commit messages that start with '#'.
+> This might result in unexpected behavior with commitlint.
 
 Check commit message of a hash:
 
