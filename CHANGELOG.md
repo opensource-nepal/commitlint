@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## [1.3.0](https://github.com/opensource-nepal/commitlint/compare/v1.2.0...v1.3.0) (2024-08-07)
+
+
+### Features
+
+* enhanced actions logging with clear annotations ([#61](https://github.com/opensource-nepal/commitlint/issues/61)) ([7f72e91](https://github.com/opensource-nepal/commitlint/commit/7f72e9108526ef0f05afcb1627d1239ed41324c6))
+
 ## [1.2.0](https://github.com/opensource-nepal/commitlint/compare/v1.1.0...v1.2.0) (2024-07-24)
 
 
