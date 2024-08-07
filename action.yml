@@ -1,5 +1,6 @@
 name: 'Conventional Commitlint'
 description: 'A GitHub Action to check conventional commit message'
+
 inputs:
   fail_on_error:
     description: Whether to fail the workflow if commit messages don't follow conventions.
@@ -9,6 +10,11 @@ inputs:
     description: Verbose output.
     default: 'false'
     required: false
+  token:
+    description: Token for fetching commits using Github API.
+    default: ${{ github.token }}
+    required: false
+
 outputs:
   status:
     description: Status
@@ -16,9 +22,11 @@ outputs:
   exit_code:
     description: Exit Code
     value: ${{ steps.commitlint.outputs.exit_code }}
+
 branding:
   color: 'red'
   icon: 'git-commit'
+
 runs:
   using: 'composite'
   steps:
@@ -27,41 +35,14 @@ runs:
       with:
         python-version: '3.8'
 
-    - name: Install Commitlint
-      run: python -m pip install --disable-pip-version-check -e ${{ github.action_path }}
-      shell: bash
-
-    # checkout to the source code
-    # for push event
-    - name: Get pushed commit count
-      if: github.event_name == 'push'
-      id: push_commit_count
-      run: |
-        echo "count=$(echo '${{ toJson(github.event.commits) }}' | jq '. | length')" \
-          >> $GITHUB_OUTPUT
-      shell: bash
-
-    - name: Checkout to pushed commits
-      if: github.event_name == 'push'
-      uses: actions/checkout@v4.1.7
-      with:
-        ref: ${{ github.sha }}
-        fetch-depth: ${{ steps.push_commit_count.outputs.count }}
-
-    # for pull_request event
-    - name: Checkout to PR source branch
-      if: github.event_name == 'pull_request'
-      uses: actions/checkout@v4.1.7
-      with:
-        ref: ${{ github.event.pull_request.head.sha }}
-        fetch-depth: ${{ github.event.pull_request.commits }}
-
-    # checking the commits (for both push and pull_request)
-    - name: Check the commits
+    - name: Commitlint Action
       id: commitlint
       run: |
-        python ${{ github.action_path }}/github_actions/run.py
+        python -m pip install --quiet --disable-pip-version-check -e ${GITHUB_ACTION_PATH}
+        python ${{ github.action_path }}/github_actions
       shell: bash
       env:
+        # NOTE: Remove once https://github.com/actions/runner/issues/665 is fixed.
+        INPUT_TOKEN: ${{ inputs.token }}
         INPUT_FAIL_ON_ERROR: ${{ inputs.fail_on_error }}
         INPUT_VERBOSE: ${{ inputs.verbose }}
