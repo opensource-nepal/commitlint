@@ -36,79 +36,73 @@ class ArgsMock(Mock):
 class TestCLIGetArgs:
     # get_args
 
-    @patch(
-        "argparse.ArgumentParser.parse_args",
-        return_value=ArgsMock(
-            commit_message="commit message",
-            file=None,
-            hash=None,
-            from_hash=None,
-            quiet=None,
-        ),
-    )
+    @patch("sys.argv", ["prog", "commit message"])
     def test__get_args__with_commit_message(self, *_):
         args = get_args()
         assert args.commit_message == "commit message"
-        assert args.file is None
-        assert args.hash is None
-        assert args.from_hash is None
-        assert args.quiet is None
 
-    @patch(
-        "argparse.ArgumentParser.parse_args",
-        return_value=ArgsMock(file="path/to/file.txt"),
-    )
+    @patch("sys.argv", ["prog"])
+    def test__get_args__without_commit_message(self, *_):
+        with pytest.raises(SystemExit) as ex:
+            get_args()
+        assert ex.value.code == 2
+
+    @patch("sys.argv", ["prog", "--file", "path/to/file.txt"])
     def test__get_args__with_file(self, *_):
         args = get_args()
         assert args.file == "path/to/file.txt"
 
-    @patch(
-        "argparse.ArgumentParser.parse_args",
-        return_value=ArgsMock(hash="commit_hash", file=None),
-    )
+    @patch("sys.argv", ["prog", "--hash", "commit_hash"])
     def test__get_args__with_hash(self, *_):
         args = get_args()
         assert args.hash == "commit_hash"
-        assert args.file is None
 
-    @patch(
-        "argparse.ArgumentParser.parse_args",
-        return_value=ArgsMock(from_hash="from_commit_hash", file=None, hash=None),
-    )
+    @patch("sys.argv", ["prog", "--from-hash", "from_commit_hash"])
     def test__get_args__with_from_hash(self, *_):
         args = get_args()
         assert args.from_hash == "from_commit_hash"
-        assert args.file is None
-        assert args.hash is None
+        assert args.to_hash == "HEAD"
+
+    @patch("sys.argv", ["prog", "--to-hash", "to_commit_hash"])
+    def test__get_args__with_to_hash_without_from_hash(self, *_):
+        with pytest.raises(SystemExit) as ex:
+            get_args()
+        assert ex.value.code == 2
 
     @patch(
-        "argparse.ArgumentParser.parse_args",
-        return_value=ArgsMock(
-            from_hash="from_commit_hash", to_hash="to_commit_hash", file=None, hash=None
-        ),
+        "sys.argv",
+        ["prog", "--from-hash", "from_commit_hash", "--to-hash", "to_commit_hash"],
     )
     def test__get_args__with_to_hash(self, *_):
         args = get_args()
         assert args.from_hash == "from_commit_hash"
         assert args.to_hash == "to_commit_hash"
-        assert args.file is None
-        assert args.hash is None
 
-    @patch(
-        "argparse.ArgumentParser.parse_args",
-        return_value=ArgsMock(skip_detail=True),
-    )
+    @patch("sys.argv", ["prog", "--skip-detail", "commit_msg"])
     def test__get_args__with_skip_detail(self, *_):
         args = get_args()
         assert args.skip_detail is True
 
-    @patch(
-        "argparse.ArgumentParser.parse_args",
-        return_value=ArgsMock(hide_input=True),
-    )
+    @patch("sys.argv", ["prog", "--hide-input", "commit_msg"])
     def test__get_args__with_hide_input(self, *_):
         args = get_args()
         assert args.hide_input is True
+
+    @patch("sys.argv", ["prog", "--verbose", "commit_msg"])
+    def test__get_args__with_verbose(self, *_):
+        args = get_args()
+        assert args.verbose is True
+
+    @patch("sys.argv", ["prog", "--quiet", "commit_msg"])
+    def test__get_args__with_quiet(self, *_):
+        args = get_args()
+        assert args.quiet is True
+
+    @patch("sys.argv", ["prog", "--quiet", "--verbose", "commit_msg"])
+    def test__get_args___fails_with_quiet_and_verbose(self, *_):
+        with pytest.raises(SystemExit) as ex:
+            get_args()
+        assert ex.value.code == 2
 
 
 @patch("commitlint.console.success")
