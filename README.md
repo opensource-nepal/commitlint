@@ -45,7 +45,7 @@ For more details, please refer to the Conventional Commits specification at http
    repos:
       ...
       - repo: https://github.com/opensource-nepal/commitlint
-        rev: v1.0.0
+        rev: v1.2.0
         hooks:
           - id: commitlint
       ...
