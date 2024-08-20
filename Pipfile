@@ -12,7 +12,7 @@ pytest-cov = "*"
 
 [scripts]
 test = "pytest"
-coverage = "pytest --cov=src/ --no-cov-on-fail"
-coverage-html = "pytest --cov=src/ --cov-report=html --no-cov-on-fail"
-coverage-xml = "pytest --cov=src/ --cov-report=xml --no-cov-on-fail"
+coverage = "pytest --cov=src --cov=github_actions"
+coverage-html = "pytest --cov=src --cov=github_actions --cov-report=html"
+coverage-xml = "pytest --cov=src --cov=github_actions --cov-report=xml"
 install-hooks = "pre-commit install --hook-type pre-commit --hook-type commit-msg"
