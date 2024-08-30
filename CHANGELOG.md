@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## [1.3.0](https://github.com/opensource-nepal/commitlint/compare/v1.2.0...v1.3.0) (2024-08-30)
+
+
+### Features
+
+* enhanced actions logging with clear annotations ([#61](https://github.com/opensource-nepal/commitlint/issues/61)) ([7f72e91](https://github.com/opensource-nepal/commitlint/commit/7f72e9108526ef0f05afcb1627d1239ed41324c6))
+
+
+### Bug Fixes
+
+* fix major version tag fetch on pre-commit autoupdate ([#65](https://github.com/opensource-nepal/commitlint/issues/65)) ([dffb36b](https://github.com/opensource-nepal/commitlint/commit/dffb36bf7774910ae14417f57b22a12ff0cb323b))
+
 ## [1.2.0](https://github.com/opensource-nepal/commitlint/compare/v1.1.0...v1.2.0) (2024-07-24)
 
 
