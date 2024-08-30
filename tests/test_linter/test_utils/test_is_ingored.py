@@ -27,6 +27,9 @@ from commitlint.linter.utils import is_ignored
         ("Merge my feature", False),
         ("Add new feature", False),
         ("feat: this is conventional commit format", False),
+        ("Bump urllib3 from 1.26.5 to 1.26.17", True),
+        ("bump @babel/traverse from 7.22.17 to 7.24.0", True),
+        ("Bump feature1 from feature2", False),
     ],
 )
 def test__is_ignored(commit_message, expected_result):

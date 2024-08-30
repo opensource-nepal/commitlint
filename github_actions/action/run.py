@@ -6,7 +6,6 @@ pull_request and pull_request_target events.
 import os
 import subprocess
 import sys
-from math import ceil
 from typing import Iterable, List, Optional, Tuple, cast
 
 from .event import GitHubEvent
@@ -33,6 +32,7 @@ STATUS_SUCCESS = "success"
 STATUS_FAILURE = "failure"
 
 MAX_PR_COMMITS = 250
+PER_PAGE_COMMITS = 50
 
 
 def get_push_commit_messages(event: GitHubEvent) -> Iterable[str]:
@@ -75,8 +75,7 @@ def get_pr_commit_messages(event: GitHubEvent) -> Iterable[str]:
         )
 
     # pagination
-    per_page = 50
-    total_page = ceil(total_commits / per_page)
+    total_page = 1 + total_commits // PER_PAGE_COMMITS
 
     commits: List[str] = []
     for page in range(1, total_page + 1):
@@ -84,7 +83,7 @@ def get_pr_commit_messages(event: GitHubEvent) -> Iterable[str]:
             method="GET",
             url=f"/repos/{repo}/pulls/{pr_number}/commits",
             token=token,
-            params={"per_page": per_page, "page": page},
+            params={"per_page": PER_PAGE_COMMITS, "page": page},
         )
 
         if status != 200:
