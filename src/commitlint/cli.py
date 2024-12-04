@@ -59,7 +59,6 @@ def get_args() -> argparse.Namespace:
     group.add_argument("--from-hash", type=str, help="From commit hash")
     # --to-hash is optional
     parser.add_argument("--to-hash", type=str, help="To commit hash", default="HEAD")
-
     # feature options
     parser.add_argument(
         "--skip-detail",
@@ -85,6 +84,14 @@ def get_args() -> argparse.Namespace:
         default=False,
     )
 
+    output_group.add_argument(
+        "--max-header-length", help="commit message header max length"
+    )
+    output_group.add_argument(
+        "--disable-header-length-check",
+        action="store_true",
+        help="disable header max length check",
+    )
     # --verbose option is optional
     output_group.add_argument(
         "-v",
@@ -152,10 +159,13 @@ def _get_commit_message_from_file(filepath: str) -> str:
         return commit_message
 
 
+# pylint: disable=too-many-arguments
 def _handle_commit_message(
     commit_message: str,
     skip_detail: bool,
     hide_input: bool,
+    max_header_length: int,
+    disable_max_header_length_check: bool = False,
     strip_comments: bool = False,
 ) -> None:
     """
@@ -171,7 +181,13 @@ def _handle_commit_message(
     Raises:
         SystemExit: If the commit message is invalid.
     """
-    success, errors = lint_commit_message(commit_message, skip_detail, strip_comments)
+    success, errors = lint_commit_message(
+        commit_message=commit_message,
+        skip_detail=skip_detail,
+        strip_comments=strip_comments,
+        max_header_length=max_header_length,
+        disable_max_header_length=disable_max_header_length_check,
+    )
 
     if success:
         console.success(VALIDATION_SUCCESSFUL)
@@ -182,7 +198,11 @@ def _handle_commit_message(
 
 
 def _handle_multiple_commit_messages(
-    commit_messages: List[str], skip_detail: bool, hide_input: bool
+    commit_messages: List[str],
+    skip_detail: bool,
+    hide_input: bool,
+    disable_max_header_length_check: bool,
+    max_header_length: int,
 ) -> None:
     """
     Handles multiple commit messages, checks their validity, and prints the result.
@@ -198,7 +218,12 @@ def _handle_multiple_commit_messages(
     has_error = False
 
     for commit_message in commit_messages:
-        success, errors = lint_commit_message(commit_message, skip_detail)
+        success, errors = lint_commit_message(
+            commit_message,
+            max_header_length=max_header_length,
+            skip_detail=skip_detail,
+            disable_max_header_length=disable_max_header_length_check,
+        )
         if success:
             console.verbose("lint success")
             continue
@@ -224,6 +249,14 @@ def main() -> None:
     config.verbose = args.verbose
 
     console.verbose("starting commitlint")
+
+    if args.max_header_length and args.disable_header_length_check:
+        console.error(
+            "--max-header-length and "
+            "--disable-header-length-check can't be passed together"
+        )
+        raise CommitlintException
+
     try:
         if args.file:
             console.verbose("commit message source: file")
@@ -232,13 +265,19 @@ def main() -> None:
                 commit_message,
                 skip_detail=args.skip_detail,
                 hide_input=args.hide_input,
+                disable_max_header_length_check=args.disable_header_length_check,
+                max_header_length=args.max_header_length,
                 strip_comments=True,
             )
         elif args.hash:
             console.verbose("commit message source: hash")
             commit_message = get_commit_message_of_hash(args.hash)
             _handle_commit_message(
-                commit_message, skip_detail=args.skip_detail, hide_input=args.hide_input
+                commit_message,
+                skip_detail=args.skip_detail,
+                hide_input=args.hide_input,
+                max_header_length=args.max_header_length,
+                disable_max_header_length_check=args.disable_header_length_check,
             )
         elif args.from_hash:
             console.verbose("commit message source: hash range")
@@ -249,12 +288,18 @@ def main() -> None:
                 commit_messages,
                 skip_detail=args.skip_detail,
                 hide_input=args.hide_input,
+                max_header_length=args.max_header_length,
+                disable_max_header_length_check=args.disable_header_length_check,
             )
         else:
             console.verbose("commit message source: direct message")
             commit_message = args.commit_message.strip()
             _handle_commit_message(
-                commit_message, skip_detail=args.skip_detail, hide_input=args.hide_input
+                commit_message,
+                skip_detail=args.skip_detail,
+                hide_input=args.hide_input,
+                max_header_length=args.max_header_length,
+                disable_max_header_length_check=args.disable_header_length_check,
             )
     except CommitlintException as ex:
         console.error(f"{ex}")

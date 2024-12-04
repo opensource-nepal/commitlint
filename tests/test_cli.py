@@ -459,3 +459,46 @@ class TestCLIMainQuiet:
 
         mock_stderr_write.assert_not_called()
         mock_stdout_write.assert_not_called()
+
+
+class TestCliHeaderLength:
+    @patch(
+        "commitlint.cli.get_args",
+        return_value=ArgsMock(
+            commit_message="feat: add method 'formatEnglishDate' \
+                           and 'formatEnglishDateInNepali' (#165)",
+            quiet=True,
+            max_header_length=20,
+        ),
+    )
+    @patch("sys.stdout.write")
+    @patch("sys.stderr.write")
+    def test__main__quiet_option_with_header_max_length(
+        self, mock_stderr_write, mock_stdout_write, *_
+    ):
+        with pytest.raises(SystemExit):
+            main()
+
+        mock_stderr_write.assert_not_called()
+        mock_stdout_write.assert_not_called()
+
+    @patch(
+        "commitlint.cli.get_args",
+        return_value=ArgsMock(
+            commit_message="feat: add method 'formatEnglishDate' \
+                               and 'formatEnglishDateInNepali' (#165)",
+            quiet=True,
+            max_header_length=20,
+            disable_header_length_check=True,
+        ),
+    )
+    @patch("sys.stdout.write")
+    @patch("sys.stderr.write")
+    def test__with_both_header_max_length_and_disabled_max_header_length_check(
+        self, mock_stderr_write, mock_stdout_write, *_
+    ):
+        with pytest.raises(CommitlintException):
+            main()
+
+        mock_stderr_write.assert_not_called()
+        mock_stdout_write.assert_not_called()

@@ -6,7 +6,7 @@ conventional commit standards.
 
 import re
 from abc import ABC, abstractmethod
-from typing import List, Tuple, Type, Union
+from typing import Any, Dict, List, Tuple, Union, cast
 
 from .. import console
 from ..constants import COMMIT_HEADER_MAX_LENGTH, COMMIT_TYPES
@@ -30,15 +30,15 @@ from ..messages import (
 class CommitValidator(ABC):
     """Abstract Base validator for commit message."""
 
-    def __init__(self, commit_message: str) -> None:
+    def __init__(self, commit_message: str, **kwargs: Dict[str, Any]) -> None:
         self._commit_message = commit_message
         self._errors: List[str] = []
 
         # start validation
-        self.validate()
+        self.validate(**kwargs)
 
     @abstractmethod
-    def validate(self) -> None:
+    def validate(self, **kwargs: Dict[str, Any]) -> None:
         """Performs the validation."""
         raise NotImplementedError  # pragma: no cover
 
@@ -50,6 +50,7 @@ class CommitValidator(ABC):
         """Checks if there are any errors."""
         return len(self._errors) == 0
 
+    @property
     def errors(self) -> List[str]:
         """Get the list of errors."""
         return self._errors
@@ -63,15 +64,23 @@ class CommitValidator(ABC):
 class HeaderLengthValidator(CommitValidator):
     """Validator for checking commit header length."""
 
-    def validate(self) -> None:
+    def validate(self, **kwargs: Dict[str, Any]) -> None:
         """
         Validates the length of the commit header.
 
         Returns:
             None
         """
+        max_header_length = kwargs.get("max_header_length")
+
+        if max_header_length:
+            header_length = cast(int, max_header_length)
+        else:
+            header_length = COMMIT_HEADER_MAX_LENGTH
+
         header = self.commit_message.split("\n")[0]
-        if len(header) > COMMIT_HEADER_MAX_LENGTH:
+
+        if len(header) > int(header_length):
             self.add_error(HEADER_LENGTH_ERROR)
 
 
@@ -90,7 +99,7 @@ class SimplePatternValidator(CommitValidator):
         r"((\n\n(?P<body>.*))|(\s*))?$"
     )
 
-    def validate(self) -> None:
+    def validate(self, **kwargs: Dict[str, Any]) -> None:
         """
         Validates the commit message using the regex pattern.
 
@@ -118,7 +127,7 @@ class PatternValidator(CommitValidator):
         r"(((?P<body>.*))|(\s*))?$"
     )
 
-    def validate(self) -> None:
+    def validate(self, **kwargs: Dict[str, Any]) -> None:
         """
         Validates the commit message using the regex pattern.
 
@@ -286,8 +295,7 @@ class PatternValidator(CommitValidator):
 
 
 def run_validators(
-    commit_message: str,
-    validator_classes: List[Type[CommitValidator]],
+    validator_classes: List[CommitValidator],
     fail_fast: bool = False,
 ) -> Tuple[bool, List[str]]:
     """Runs the provided validators for the commit message.
@@ -307,17 +315,18 @@ def run_validators(
     success = True
     errors: List[str] = []
 
-    for validator_class in validator_classes:
-        console.verbose(f"running validator {validator_class.__name__}")
-        validator = validator_class(commit_message)
-        if not validator.is_valid():
-            console.verbose(f"{validator_class.__name__}: validation failed")
+    for validator_instance in validator_classes:
+        console.verbose(f"running validator {validator_instance.__class__.__name__}")
+        if not validator_instance.is_valid():
+            console.verbose(
+                f"{validator_instance.__class__.__name__}: validation failed"
+            )
             if fail_fast:
                 console.verbose(f"fail_fast: {fail_fast}, skipping further validations")
                 # returning immediately if any error occurs.
-                return False, validator.errors()
+                return False, validator_instance.errors
 
             success = False
-            errors.extend(validator.errors())
+            errors.extend(validator_instance.errors)
 
     return success, errors
