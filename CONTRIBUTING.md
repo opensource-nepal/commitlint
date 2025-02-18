@@ -1,43 +1,111 @@
-# How to Contribute
+# Contributing Guide
 
-## Install Development Dependencies (Using Pipenv)
+Thank you for your interest in contributing to the **commitlint** project!
+Your contributions will help improve and enhance this tool.
+Please take a moment to review the following guidelines before getting started.
 
-All the dependencies are managed by Pipenv. Please install Pipenv on your system first by following the instructions at [https://pipenv.pypa.io/en/latest/installation.html](https://pipenv.pypa.io/en/latest/installation.html).
+## Prerequisites
 
-Once Pipenv is installed, you can install the development dependencies by running the following command:
+Before contributing, ensure that you have the following:
+
+- **Python 3.10 or higher** installed. Download it from the [official Python website](https://www.python.org/downloads/).
+- **Poetry** installed for dependency management. Follow the [Poetry installation guide](https://python-poetry.org/docs/#installation).
+
+## Getting Started
+
+To set up the project on your local machine, follow these steps:
+
+1. **Fork** the repository on GitHub.
+2. **Clone** the forked repository to your local machine:
+
+   ```bash
+   git clone https://github.com/<your-username>/commitlint.git
+   cd commitlint
+   ```
+
+3. **Install dependencies**:
+
+   ```bash
+   poetry install
+   ```
+
+4. **Verify your setup**:
+
+   ```bash
+   poetry run commitlint --version
+   ```
+
+## Tests
+
+Run tests
 
 ```bash
-pipenv install --dev
+poetry run pytest
 ```
 
-## Install pre-commit hooks
-
-To install pre-commit and commit-msg hook for this project, run the following command:
+Run tests with coverage
 
 ```bash
-pipenv run install-hooks
+poetry run pytest --cov=src
 ```
 
-## Run tests
-
-Run the tests using the below command:
+Generate html coverage
 
 ```bash
-pipenv run test
+poetry run pytest --cov=src/ --cov-report=html
 ```
 
-## Before submitting
+## Use pre-commit hook
 
-Before submitting your Pull Request, please do the following steps:
+Install pre-commit hook using the command below.
 
-1. Add any changes you want.
-1. Add tests for the new changes.
-1. Edit documentation (`README.md`) if you have changed something significant.
-1. Commit your changes using [semantic commit message](https://seesparkbox.com/foundry/semantic_commit_messages).
-   Examples: `"fix: Fixed foobar bug"`, `"feat(accounts): Added foobar feature on accounts"`.
+```bash
+poetry run pre-commit install --hook-type pre-commit --hook-type commit-msg
+```
 
-## Other help
+## Pull Requests
 
-You can contribute by spreading a word about this library.
-It would also be a huge contribution to write a short article on how you are using this project.
-You can also share your best practices with us.
+We welcome and appreciate pull requests from the community. To contribute:
+
+1. **Fork** the repository and create a new branch based on the `main` branch:
+
+   ```bash
+   git checkout -b <your-branch-name>
+   ```
+
+2. **Write tests** for your changes if applicable.
+3. **Follow [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)** for commit messages.
+   Examples:
+
+   - `feat: add commit message validation`
+   - `fix(parser): resolve message parsing issue`
+
+4. **Push** your branch to your forked repository:
+
+   ```bash
+   git push origin <your-branch-name>
+   ```
+
+5. **Create a Pull Request**:
+
+   - Open a pull request from your branch to the `main` branch of the original repository.
+   - Provide a clear and concise description of the changes, along with relevant context.
+
+6. **Review & Feedback**:
+
+   - Participate in the code review process and address any feedback promptly.
+
+## License
+
+By contributing to this project, you agree that your contributions will be licensed under the **GPL-3.0 License**.
+Refer to the [LICENSE](./LICENSE) file for more details.
+
+## Other Ways to Contribute
+
+Even if you don’t contribute code, you can still help:
+
+- **Spread the word** about this tool.
+- Write a blog or article about how you use this project.
+- Share your best practices, examples, or ideas with us.
+
+Thank you for contributing to **commitlint**! 🎉

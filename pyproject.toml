@@ -1,3 +1,54 @@
+[tool.poetry]
+name = "commitlint"
+version = "1.3.0"  # x-release-please-version
+description = "commitlint is a pre-commit hook designed to lint your commit messages according to the Conventional Commits standard."
+authors = [
+    "Ajesh Sen Thapa <aj3sshh@gmail.com>",
+    "Sugat Bajracharya<sugatbajracharya49@gmail.com>"
+]
+license = "GPL-3.0"
+readme = "README.md"
+repository = "https://github.com/opensource-nepal/commitlint"
+homepage = "https://github.com/opensource-nepal/commitlint"
+keywords = [
+    "commitlint", "commit lint", "python commitlint", "conventional commit",
+    "conventional commit message", "python commit", "github actions", "pre-commit"
+]
+classifiers = [
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3 :: Only"
+]
+packages = [{ include = "commitlint", from = "src" }]
+
+[tool.poetry.urls]
+Changelog = "https://github.com/opensource-nepal/commitlint/blob/main/CHANGELOG.md"
+Issues = "https://github.com/opensource-nepal/commitlint/issues"
+
+[tool.poetry.dependencies]
+python = ">=3.10"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "0.9.6"
+pre-commit = "4.1.0"
+
+[tool.poetry.group.test.dependencies]
+pytest = "7.3.2"
+pytest-cov = "4.1.0"
+
+[tool.poetry.scripts]
+commitlint = "commitlint.cli:main"
+
 [build-system]
-requires = ["setuptools", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+pythonpath = "src"
+testpaths = ["tests"]
+python_files = "test_*.py"
+addopts = "-vvv"

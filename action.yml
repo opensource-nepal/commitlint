@@ -33,7 +33,7 @@ runs:
     - name: Install Python
       uses: actions/setup-python@v5.1.0
       with:
-        python-version: '3.8'
+        python-version: '3.10'
 
     - name: Commitlint Action
       id: commitlint
