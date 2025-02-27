@@ -29,7 +29,7 @@ def test__run_action__calls_handle_push_events(mock_handle_push_event):
     run_action()
     mock_handle_push_event.assert_called_once()
     args, _ = mock_handle_push_event.call_args
-    assert type(args[0]) == GitHubEvent
+    assert isinstance(args[0], GitHubEvent)
     assert args[0].event_name == "push"
 
 
@@ -39,7 +39,7 @@ def test__run_action__calls_handle_pr_events(mock_handle_pr_event):
     run_action()
     mock_handle_pr_event.assert_called_once()
     args, _ = mock_handle_pr_event.call_args
-    assert type(args[0]) == GitHubEvent
+    assert isinstance(args[0], GitHubEvent)
     assert args[0].event_name == "pull_request"
 
 
@@ -51,7 +51,7 @@ def test__run_action__calls_handle_pr_events_for_pull_request_target(
     run_action()
     mock_handle_pr_event.assert_called_once()
     args, _ = mock_handle_pr_event.call_args
-    assert type(args[0]) == GitHubEvent
+    assert isinstance(args[0], GitHubEvent)
     assert args[0].event_name == "pull_request_target"
 
 
