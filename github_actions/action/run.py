@@ -87,7 +87,9 @@ def get_pr_commit_messages(event: GitHubEvent) -> Iterable[str]:
         )
 
         if status != 200:
-            sys.exit(f"::error::Github API failed with status code {status}")
+            sys.exit(
+                f"::error::Github API failed with status code {status}. Response: {data}"
+            )
 
         commits.extend(commit_data["commit"]["message"] for commit_data in data)
 
