@@ -32,19 +32,41 @@ name: Conventional Commitlint
 
 on:
   push:
-    branches: ['main']
+    branches: ["main"]
   pull_request:
 
 jobs:
   commitlint:
     runs-on: ubuntu-latest
     name: Conventional Commitlint
+    permissions:
+      contents: read
+      pull-requests: read
     steps:
       - name: Conventional Commitlint
         uses: opensource-nepal/commitlint@v1
 ```
 
 > **_Note:_** The `commitlint` GitHub Action is triggered only by `push`, `pull_request`, or `pull_request_target` events.
+
+#### GitHub Action Permissions
+
+The action requires read permission for the following scopes:
+
+- `contents: read` : This allows the action to list commits of the repository.
+- `pull-requests: read` : This allows the action to list the commits in a Pull Request.
+
+For public repositories, these permissions are granted by default.
+For private repositories, you must explicitly grant them, either in:
+
+- the [repository’s default workflow permissions](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository#configuring-the-default-github_token-permissions), or
+- the [workflow/job permissions block](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#permissions)
+
+Without these, you may encounter an error like:
+
+```
+Github API failed with status code 403. Response: {'message': 'Resource not accessible by integration', 'documentation_url': 'https://docs.github.com/rest/pulls/pulls#list-commits-on-a-pull-request', 'status': '403'}
+```
 
 #### GitHub Action Inputs
 
