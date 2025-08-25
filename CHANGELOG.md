@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## [1.3.1](https://github.com/opensource-nepal/commitlint/compare/v1.3.0...v1.3.1) (2025-08-25)
+
+
+### Bug Fixes
+
+* add github api failed response ([#72](https://github.com/opensource-nepal/commitlint/issues/72)) ([e3ae577](https://github.com/opensource-nepal/commitlint/commit/e3ae577534c63cd89624e60a9e4257a0b1eee148))
+
 ## [1.3.0](https://github.com/opensource-nepal/commitlint/compare/v1.2.0...v1.3.0) (2024-08-30)
 
 
