@@ -3,7 +3,8 @@
   "packages": {
     ".": {
       "extra-files": [
-        "src/commitlint/__version__.py"
+        "src/commitlint/__version__.py",
+        "pyproject.toml"
       ]
     }
   },
