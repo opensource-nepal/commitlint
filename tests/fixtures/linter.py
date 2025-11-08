@@ -58,12 +58,20 @@ LINTER_FIXTURE_PARAMS: Tuple[Tuple[str, bool, List[str], List[str]], ...] = (
     # incorrect format check
     ("feat add new feature", False, [INCORRECT_FORMAT_ERROR]),
     # header length check
-    ("feat: " + "a" * (COMMIT_HEADER_MAX_LENGTH - 1), False, [HEADER_LENGTH_ERROR]),
-    ("feat: " + "a" * (COMMIT_HEADER_MAX_LENGTH - 1), False, [HEADER_LENGTH_ERROR]),
+    (
+        "feat: " + "a" * (COMMIT_HEADER_MAX_LENGTH - 1),
+        False,
+        [HEADER_LENGTH_ERROR % COMMIT_HEADER_MAX_LENGTH],
+    ),
+    (
+        "feat: " + "a" * (COMMIT_HEADER_MAX_LENGTH - 1),
+        False,
+        [HEADER_LENGTH_ERROR % COMMIT_HEADER_MAX_LENGTH],
+    ),
     (
         "Test " + "a" * (COMMIT_HEADER_MAX_LENGTH + 1),
         False,
-        [HEADER_LENGTH_ERROR, INCORRECT_FORMAT_ERROR],
+        [HEADER_LENGTH_ERROR % COMMIT_HEADER_MAX_LENGTH, INCORRECT_FORMAT_ERROR],
     ),
     # commit type check
     (": add new feature", False, [COMMIT_TYPE_MISSING_ERROR]),

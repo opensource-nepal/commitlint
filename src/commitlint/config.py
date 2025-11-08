@@ -4,6 +4,8 @@ Contains config for the commitlint.
 
 from typing import Optional
 
+from src.commitlint.constants import COMMIT_HEADER_MAX_LENGTH
+
 
 class _CommitlintConfig:
     """
@@ -14,6 +16,7 @@ class _CommitlintConfig:
 
     _verbose: bool = False
     _quiet: bool = False
+    _max_header_length: int = COMMIT_HEADER_MAX_LENGTH
 
     def __new__(cls) -> "_CommitlintConfig":
         """
@@ -69,6 +72,24 @@ class _CommitlintConfig:
             self._verbose = False
 
         self._quiet = value
+
+    @property
+    def max_header_length(self) -> int:
+        """
+        Get the current max_header_length setting.
+        Returns:
+            int: The current max_header_length setting.
+        """
+        return self._max_header_length
+
+    @max_header_length.setter
+    def max_header_length(self, value: int) -> None:
+        """
+        Set the max_header_length setting.
+        Args:
+            value (int): New value for max_header_length setting.
+        """
+        self._max_header_length = value
 
 
 config = _CommitlintConfig()

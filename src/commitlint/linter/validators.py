@@ -9,7 +9,8 @@ from abc import ABC, abstractmethod
 from typing import List, Tuple, Type, Union
 
 from .. import console
-from ..constants import COMMIT_HEADER_MAX_LENGTH, COMMIT_TYPES
+from ..config import config
+from ..constants import COMMIT_TYPES
 from ..messages import (
     COMMIT_TYPE_INVALID_ERROR,
     COMMIT_TYPE_MISSING_ERROR,
@@ -71,8 +72,8 @@ class HeaderLengthValidator(CommitValidator):
             None
         """
         header = self.commit_message.split("\n")[0]
-        if len(header) > COMMIT_HEADER_MAX_LENGTH:
-            self.add_error(HEADER_LENGTH_ERROR)
+        if len(header) > config.max_header_length:
+            self.add_error(HEADER_LENGTH_ERROR % config.max_header_length)
 
 
 class SimplePatternValidator(CommitValidator):
