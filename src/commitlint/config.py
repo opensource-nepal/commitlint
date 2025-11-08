@@ -4,7 +4,7 @@ Contains config for the commitlint.
 
 from typing import Optional
 
-from src.commitlint.constants import COMMIT_HEADER_MAX_LENGTH
+from .constants import COMMIT_HEADER_MAX_LENGTH
 
 
 class _CommitlintConfig:
