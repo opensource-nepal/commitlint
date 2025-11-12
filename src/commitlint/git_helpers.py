@@ -34,6 +34,7 @@ def get_commit_message_of_hash(commit_hash: str) -> str:
             stderr=subprocess.PIPE,
         ).strip()
         console.verbose(commit_message)
+        console.verbose("execute complete")
 
         return commit_message
     except subprocess.CalledProcessError as ex:
@@ -91,6 +92,7 @@ def get_commit_messages_of_hash_range(
             stderr=subprocess.PIPE,
         )
         console.verbose(commit_messages_output)
+        console.verbose("execute complete")
 
         commit_messages = commit_messages_output.split(f"{delimiter}\n")
         return [from_commit_message] + [

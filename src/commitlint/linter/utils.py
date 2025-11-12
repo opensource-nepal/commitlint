@@ -21,7 +21,8 @@ def is_ignored(commit_message: str) -> bool:
     Returns:
         bool: True if the commit message should be ignored, False otherwise.
     """
-    return bool(re.match(IGNORE_COMMIT_PATTERNS, commit_message))
+    commit_first_line = commit_message.splitlines()[0]
+    return bool(re.match(IGNORE_COMMIT_PATTERNS, commit_first_line))
 
 
 def remove_comments(commit_message: str) -> str:
