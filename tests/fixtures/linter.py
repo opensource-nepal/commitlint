@@ -47,6 +47,11 @@ LINTER_FIXTURE_PARAMS: Tuple[Tuple[str, bool, List[str], List[str]], ...] = (
     ("feat!: breaking feature", True, []),
     # ignored commits (success)
     ("Merge pull request #123", True, []),
+    (
+        "Merge branch 'main' into release\nthis is second line",
+        True,
+        [],
+    ),
     ("Bump urllib3 from 1.26.5 to 1.26.17", True, []),
     ("Bump github.com/ollama/ollama from 0.1.48 to 0.2.0", True, []),
     ("bump @babel/traverse from 7.22.17 to 7.24.0", True, []),
@@ -55,6 +60,8 @@ LINTER_FIXTURE_PARAMS: Tuple[Tuple[str, bool, List[str], List[str]], ...] = (
         True,
         [],
     ),
+    ("Initial commit", True, []),
+    ("initial Commit", True, []),
     # incorrect format check
     ("feat add new feature", False, [INCORRECT_FORMAT_ERROR]),
     # header length check
