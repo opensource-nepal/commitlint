@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## [1.3.2](https://github.com/opensource-nepal/commitlint/compare/v1.3.1...v1.3.2) (2025-11-23)
+
+
+### Bug Fixes
+
+* check only first line for ignoring auto generated commits ([#80](https://github.com/opensource-nepal/commitlint/issues/80)) ([d4867b0](https://github.com/opensource-nepal/commitlint/commit/d4867b0e8f5ac23668c1d2f1299ac25bee9d0580))
+
 ## [1.3.1](https://github.com/opensource-nepal/commitlint/compare/v1.3.0...v1.3.1) (2025-08-25)
 
 
