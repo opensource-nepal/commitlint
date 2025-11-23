@@ -74,6 +74,12 @@ def get_args() -> argparse.Namespace:
         help="Hide input from stdout",
         default=False,
     )
+    # --max-header-length option is optional
+    parser.add_argument(
+        "--max-header-length",
+        type=int,
+        help="Set the maximum header length",
+    )
 
     output_group = parser.add_mutually_exclusive_group(required=False)
     # --quiet option is optional

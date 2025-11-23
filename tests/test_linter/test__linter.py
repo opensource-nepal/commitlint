@@ -51,7 +51,7 @@ def test__lint_commit_message__skip_detail_returns_header_length_error_message()
     commit_message = "Test " + "a" * (COMMIT_HEADER_MAX_LENGTH + 1)
     success, errors = lint_commit_message(commit_message, skip_detail=True)
     assert success is False
-    assert errors == [HEADER_LENGTH_ERROR]
+    assert errors == [HEADER_LENGTH_ERROR % COMMIT_HEADER_MAX_LENGTH]
 
 
 def test__lint_commit_message__skip_detail_returns_invalid_format_error_message():

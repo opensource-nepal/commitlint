@@ -1,14 +1,18 @@
-name: 'Conventional Commitlint'
-description: 'A GitHub Action to check conventional commit message'
+name: "Conventional Commitlint"
+description: "A GitHub Action to check conventional commit message"
 
 inputs:
   fail_on_error:
     description: Whether to fail the workflow if commit messages don't follow conventions.
-    default: 'true'
+    default: "true"
     required: false
   verbose:
     description: Verbose output.
-    default: 'false'
+    default: "false"
+    required: false
+  max_header_length:
+    description: Maximum length for commit message header.
+    default: "72"
     required: false
   token:
     description: Token for fetching commits using Github API.
@@ -24,16 +28,16 @@ outputs:
     value: ${{ steps.commitlint.outputs.exit_code }}
 
 branding:
-  color: 'red'
-  icon: 'git-commit'
+  color: "red"
+  icon: "git-commit"
 
 runs:
-  using: 'composite'
+  using: "composite"
   steps:
     - name: Install Python
       uses: actions/setup-python@v5.1.0
       with:
-        python-version: '3.10'
+        python-version: "3.10"
 
     - name: Commitlint Action
       id: commitlint

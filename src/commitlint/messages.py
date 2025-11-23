@@ -10,9 +10,7 @@ VALIDATION_FAILED = "Commit validation: failed!"
 INCORRECT_FORMAT_ERROR = (
     "Commit message does not follow the Conventional Commits format."
 )
-HEADER_LENGTH_ERROR = (
-    f"Header length cannot exceed {COMMIT_HEADER_MAX_LENGTH} characters."
-)
+HEADER_LENGTH_ERROR = "Header length cannot exceed %d characters."
 COMMIT_TYPE_MISSING_ERROR = "Type is missing."
 COMMIT_TYPE_INVALID_ERROR = (
     f"Invalid type '%s'. Type must be one of: {', '.join(COMMIT_TYPES)}."
