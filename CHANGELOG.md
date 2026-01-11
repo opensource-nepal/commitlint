@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## [1.13.3](https://github.com/opensource-nepal/commitlint/compare/v1.3.2...v1.13.3) (2026-01-11)
+
+
+### Miscellaneous Chores
+
+* fix missing release of v1.13.2 ([#83](https://github.com/opensource-nepal/commitlint/issues/83)) ([adefded](https://github.com/opensource-nepal/commitlint/commit/adefded1809e2d459dcc07ba6ebc78cc746b126a))
+
 ## [1.3.2](https://github.com/opensource-nepal/commitlint/compare/v1.3.1...v1.3.2) (2025-11-23)
 
 
