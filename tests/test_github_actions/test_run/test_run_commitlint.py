@@ -4,7 +4,15 @@ import os
 import subprocess
 from unittest.mock import patch
 
+import pytest
+
 from github_actions.action.run import run_commitlint
+from tests.fixtures.actions_env import set_github_env_vars
+
+
+@pytest.fixture(scope="module", autouse=True)
+def setup_env():
+    set_github_env_vars()
 
 
 @patch("subprocess.check_output", return_value="feat: valid commit message")
@@ -53,6 +61,24 @@ def test__run_commitlint__verbose(mock_check_output):
     assert result == (True, None)
     mock_check_output.assert_called_once_with(
         ["commitlint", commit_message, "--hide-input", "--verbose"],
+        text=True,
+        stderr=subprocess.PIPE,
+    )
+
+
+@patch(
+    "subprocess.check_output",
+    return_value="feat: valid commit message",
+)
+@patch.dict(os.environ, {**os.environ, "INPUT_MAX_HEADER_LENGTH": "72"})
+def test__run_commitlint__max_header_length(mock_check_output):
+    commit_message = "feat: add new feature"
+
+    result = run_commitlint(commit_message)
+
+    assert result == (True, None)
+    mock_check_output.assert_called_once_with(
+        ["commitlint", commit_message, "--hide-input", "--max-header-length", "72"],
         text=True,
         stderr=subprocess.PIPE,
     )

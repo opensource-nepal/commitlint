@@ -22,5 +22,3 @@ E.g., `feat(parser): add JSON parser`.
 **Body:** A detailed description of the commit.
 
 For more details, please refer to the Conventional Commits specification at https://www.conventionalcommits.org/en/v1.0.0/
-
-> NOTE: commitlint also checks the length of the commit header (**max 72 characters**). The commit header refers to the first line of the commit message (excluding the body).

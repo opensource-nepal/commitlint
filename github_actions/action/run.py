@@ -12,6 +12,7 @@ from .event import GitHubEvent
 from .utils import (
     get_boolean_input,
     get_input,
+    get_positive_int_input,
     request_github_api,
     write_line_to_file,
     write_output,
@@ -26,6 +27,7 @@ EVENT_PULL_REQUEST_TARGET = "pull_request_target"
 INPUT_TOKEN = "token"
 INPUT_FAIL_ON_ERROR = "fail_on_error"
 INPUT_VERBOSE = "verbose"
+INPUT_MAX_HEADER_LENGTH = "max_header_length"
 
 # Status
 STATUS_SUCCESS = "success"
@@ -114,6 +116,10 @@ def run_commitlint(commit_message: str) -> Tuple[bool, Optional[str]]:
         verbose = get_boolean_input(INPUT_VERBOSE)
         if verbose:
             commands.append("--verbose")
+
+        max_header_length = get_positive_int_input(INPUT_MAX_HEADER_LENGTH)
+        if max_header_length is not None:
+            commands.extend(["--max-header-length", str(max_header_length)])
 
         output = subprocess.check_output(commands, text=True, stderr=subprocess.PIPE)
         if output:

@@ -95,6 +95,17 @@ We welcome and appreciate pull requests from the community. To contribute:
 
    - Participate in the code review process and address any feedback promptly.
 
+## Release
+
+The release process, changelog, and versioning are managed by
+[release-please](https://github.com/googleapis/release-please). Versions are automatically
+determined based on Conventional Commit types, and the changelog is generated from commit
+messages.
+
+The [release-please-action](https://github.com/googleapis/release-please-action) creates
+a release PR ([example PR](https://github.com/opensource-nepal/commitlint/pull/62)) for
+bug fixes and features. A new release is published only after the release PR is merged.
+
 ## License
 
 By contributing to this project, you agree that your contributions will be licensed under the **GPL-3.0 License**.

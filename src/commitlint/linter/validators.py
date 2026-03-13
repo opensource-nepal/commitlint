@@ -9,7 +9,8 @@ from abc import ABC, abstractmethod
 from typing import List, Tuple, Type, Union
 
 from .. import console
-from ..constants import COMMIT_HEADER_MAX_LENGTH, COMMIT_TYPES
+from ..app_params import AppParams
+from ..constants import COMMIT_TYPES
 from ..messages import (
     COMMIT_TYPE_INVALID_ERROR,
     COMMIT_TYPE_MISSING_ERROR,
@@ -30,8 +31,9 @@ from ..messages import (
 class CommitValidator(ABC):
     """Abstract Base validator for commit message."""
 
-    def __init__(self, commit_message: str) -> None:
+    def __init__(self, commit_message: str, params: AppParams) -> None:
         self._commit_message = commit_message
+        self._params = params
         self._errors: List[str] = []
 
         # start validation
@@ -70,9 +72,15 @@ class HeaderLengthValidator(CommitValidator):
         Returns:
             None
         """
+        max_header_length = self._params.max_header_length
+
+        if max_header_length is None:
+            # skip header length check
+            return
+
         header = self.commit_message.split("\n")[0]
-        if len(header) > COMMIT_HEADER_MAX_LENGTH:
-            self.add_error(HEADER_LENGTH_ERROR)
+        if len(header) > max_header_length:
+            self.add_error(HEADER_LENGTH_ERROR % max_header_length)
 
 
 class SimplePatternValidator(CommitValidator):
@@ -134,7 +142,7 @@ class PatternValidator(CommitValidator):
 
         self.re_match = pattern_match
 
-        validators = [
+        validate_fns = [
             self.validate_commit_type,
             self.validate_commit_type_no_space_after,
             self.validate_scope,
@@ -145,8 +153,8 @@ class PatternValidator(CommitValidator):
             self.validate_description_no_full_stop_at_end,
         ]
 
-        for validator in validators:
-            error = validator()
+        for validate_fn in validate_fns:
+            error = validate_fn()
             if error:
                 self.add_error(error)
 
@@ -287,6 +295,7 @@ class PatternValidator(CommitValidator):
 
 def run_validators(
     commit_message: str,
+    params: AppParams,
     validator_classes: List[Type[CommitValidator]],
     fail_fast: bool = False,
 ) -> Tuple[bool, List[str]]:
@@ -294,6 +303,8 @@ def run_validators(
 
     Args:
         commit_message (str): The commit message to validate.
+        params (AppParams): Application parameters for configuring
+                            validation and output.
         validator_classes (List[Type[CommitValidator]]): List of validator classes to
             run.
         fail_fast (bool, optional): Return early if one validator fails. Defaults to
@@ -309,7 +320,7 @@ def run_validators(
 
     for validator_class in validator_classes:
         console.verbose(f"running validator {validator_class.__name__}")
-        validator = validator_class(commit_message)
+        validator = validator_class(commit_message, params)
         if not validator.is_valid():
             console.verbose(f"{validator_class.__name__}: validation failed")
             if fail_fast:

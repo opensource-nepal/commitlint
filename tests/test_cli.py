@@ -12,6 +12,7 @@ from commitlint.messages import (
     INCORRECT_FORMAT_ERROR,
     VALIDATION_FAILED,
     VALIDATION_SUCCESSFUL,
+    HEADER_LENGTH_ERROR,
 )
 
 
@@ -103,6 +104,28 @@ class TestCLIGetArgs:
         with pytest.raises(SystemExit) as ex:
             get_args()
         assert ex.value.code == 2
+
+    @patch("sys.argv", ["prog", "--max-header-length", "72", "commit_msg"])
+    def test__get_args__with_max_header_length(self, *_):
+        args = get_args()
+        assert args.max_header_length == 72
+
+    @patch("sys.argv", ["prog", "--max-header-length", "0", "commit_msg"])
+    def test__get_args__with_max_header_length_non_positive_int(self, *_):
+        with pytest.raises(SystemExit) as ex:
+            get_args()
+        assert ex.value.code == 2
+
+    @patch("sys.argv", ["prog", "--max-header-length", "string", "commit_msg"])
+    def test__get_args__with_max_header_length_string(self, *_):
+        with pytest.raises(SystemExit) as ex:
+            get_args()
+        assert ex.value.code == 2
+
+    @patch("sys.argv", ["prog", "commit_msg"])
+    def test__get_args__max_header_length_not_set(self, *_):
+        args = get_args()
+        assert args.max_header_length is None
 
 
 @patch("commitlint.console.success")
@@ -229,6 +252,20 @@ class TestCLIMain:
                 call(f"- {INCORRECT_FORMAT_ERROR}"),
             ]
         )
+
+    @patch(
+        "commitlint.cli.get_args",
+        return_value=ArgsMock(file="path/to/non_existent_file.txt"),
+    )
+    def test__main__with_missing_file(
+        self, _mock_get_args, _mock_output_error, mock_output_success
+    ):
+        mock_open().side_effect = FileNotFoundError(
+            2, "No such file or directory", "path/to/non_existent_file.txt"
+        )
+
+        with pytest.raises(SystemExit):
+            main()
 
     # main: hash
 
@@ -369,19 +406,104 @@ class TestCLIMain:
         main()
         assert config.verbose is True
 
+    # main : max-header-length
+
     @patch(
         "commitlint.cli.get_args",
-        return_value=ArgsMock(file="path/to/non_existent_file.txt"),
+        return_value=ArgsMock(
+            commit_message="feat: valid commit message " + "a" * 10000,
+        ),
     )
-    def test__main__with_missing_file(
+    def test__main__skips_header_length_check_if_max_header_length_not_set(
         self, _mock_get_args, _mock_output_error, mock_output_success
     ):
-        mock_open().side_effect = FileNotFoundError(
-            2, "No such file or directory", "path/to/non_existent_file.txt"
+        main()
+        mock_output_success.assert_called_with(f"{VALIDATION_SUCCESSFUL}")
+
+    @patch(
+        "commitlint.cli.get_args",
+        return_value=ArgsMock(
+            commit_message="feat: commit message", max_header_length=10
+        ),
+    )
+    def test__main__checks_header_length_if_max_header_length_is_passed(
+        self, _mock_get_args, mock_output_error, _mock_output_success
+    ):
+        with pytest.raises(SystemExit):
+            main()
+        mock_output_error.assert_has_calls(
+            [
+                call("⧗ Input:\nfeat: commit message\n"),
+                call("✖ Found 1 error(s)."),
+                call(f"- {HEADER_LENGTH_ERROR % 10}"),
+            ]
         )
+
+    @patch(
+        "commitlint.cli.get_args",
+        return_value=ArgsMock(file="path/to/file.txt", max_header_length=10),
+    )
+    @patch("builtins.open", mock_open(read_data="feat: commit message"))
+    def test__main__checks_header_length_if_max_header_length_is_passed__with_file_args(
+        self, _mock_get_args, mock_output_error, _mock_output_success
+    ):
+        with pytest.raises(SystemExit):
+            main()
+        mock_output_error.assert_has_calls(
+            [
+                call("⧗ Input:\nfeat: commit message\n"),
+                call("✖ Found 1 error(s)."),
+                call(f"- {HEADER_LENGTH_ERROR % 10}"),
+            ]
+        )
+
+    @patch(
+        "commitlint.cli.get_args",
+        return_value=ArgsMock(file="path/to/file.txt", max_header_length=10),
+    )
+    @patch("builtins.open", mock_open(read_data="feat: commit message"))
+    def test__main__checks_header_length_if_max_header_length_is_passed__with_hash_args(
+        self, _mock_get_args, mock_output_error, _mock_output_success
+    ):
+        with pytest.raises(SystemExit):
+            main()
+        mock_output_error.assert_has_calls(
+            [
+                call("⧗ Input:\nfeat: commit message\n"),
+                call("✖ Found 1 error(s)."),
+                call(f"- {HEADER_LENGTH_ERROR % 10}"),
+            ]
+        )
+
+    @patch(
+        "commitlint.cli.get_args",
+        return_value=ArgsMock(
+            from_hash="start_commit_hash",
+            to_hash="end_commit_hash",
+            max_header_length=10,
+        ),
+    )
+    @patch("commitlint.cli.get_commit_messages_of_hash_range")
+    def test__main__checks_header_length_if_max_header_length_is_passed__with_hash_range_args(
+        self,
+        mock_get_commit_messages,
+        _mock_get_args,
+        mock_output_error,
+        _mock_output_success,
+    ):
+        mock_get_commit_messages.return_value = [
+            "feat: commit message",
+        ]
 
         with pytest.raises(SystemExit):
             main()
+        mock_output_error.assert_has_calls(
+            [
+                call("⧗ Input:\nfeat: commit message\n"),
+                call("✖ Found 1 error(s)."),
+                call(f"- {HEADER_LENGTH_ERROR % 10}"),
+            ]
+        )
 
 
 class TestCLIMainQuiet:

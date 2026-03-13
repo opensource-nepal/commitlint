@@ -25,7 +25,7 @@ steps:
     ...
 ```
 
-If you don't have any workflows, create a new GitHub workflow file, e.g., `.github/workflows/commitlint.yaml`:
+If you don't have any workflows, create a new GitHub workflow file, e.g., `.github/workflows/commitlint.yml`:
 
 ```yaml
 name: Conventional Commitlint
@@ -70,11 +70,12 @@ Github API failed with status code 403. Response: {'message': 'Resource not acce
 
 #### GitHub Action Inputs
 
-| #   | Name              | Type    | Default                | Description                                                           |
-| --- | ----------------- | ------- | ---------------------- | --------------------------------------------------------------------- |
-| 1   | **fail_on_error** | Boolean | `true`                 | Whether the GitHub Action should fail if commitlint detects an issue. |
-| 2   | **verbose**       | Boolean | `false`                | Enables verbose output.                                               |
-| 3   | **token**         | String  | `secrets.GITHUB_TOKEN` | GitHub Token for fetching commits using the GitHub API.               |
+| #   | Name                  | Type    | Default                | Description                                                                                   |
+| --- | --------------------- | ------- | ---------------------- | --------------------------------------------------------------------------------------------- |
+| 1   | **fail_on_error**     | Boolean | `true`                 | Whether the GitHub Action should fail if commitlint detects an issue.                         |
+| 2   | **verbose**           | Boolean | `false`                | Enables verbose output.                                                                       |
+| 3   | **max_header_length** | Number  |                        | Optional. Maximum header length to check. If not specified, the header length is not checked. |
+| 4   | **token**             | String  | `secrets.GITHUB_TOKEN` | GitHub Token for fetching commits using the GitHub API.                                       |
 
 #### GitHub Action Outputs
 

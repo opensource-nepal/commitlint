@@ -24,3 +24,4 @@ def set_github_env_vars():
     os.environ["INPUT_TOKEN"] = "token"
     os.environ["INPUT_VERBOSE"] = "false"
     os.environ["INPUT_FAIL_ON_ERROR"] = "true"
+    os.environ["INPUT_MAX_HEADER_LENGTH"] = ""
