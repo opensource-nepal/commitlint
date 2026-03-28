@@ -3,8 +3,6 @@ This module provides functions for displaying outputs related to commitlint.
 
 NOTE: If any future changes are made to the output implementation,
 they will be done from here.
-
-
 """
 
 import sys

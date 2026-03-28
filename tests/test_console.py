@@ -11,7 +11,7 @@ from commitlint import console
 def test_success(mock_stdout: MagicMock, _mock_config: MagicMock):
     message = "Success message"
     console.success(message)
-    mock_stdout.write.assert_called_once_with(f"{message}\n")
+    mock_stdout.write.assert_called_once_with(f"{console.green(message)}\n")
 
 
 @patch("commitlint.console.config", quiet=True)
@@ -27,7 +27,7 @@ def test_success_for_quiet(mock_stdout: MagicMock, _mock_config: MagicMock):
 def test_error(mock_stderr: MagicMock, _mock_config: MagicMock):
     message = "Error message"
     console.error(message)
-    mock_stderr.write.assert_called_once_with(f"{message}\n")
+    mock_stderr.write.assert_called_once_with(f"{console.red(message)}\n")
 
 
 @patch("commitlint.console.config", quiet=True)
