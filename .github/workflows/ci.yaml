@@ -14,10 +14,10 @@ jobs:
         python-version: ['3.10']
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -31,14 +31,14 @@ jobs:
           poetry install
 
       - name: Run Lint
-        uses: astral-sh/ruff-action@v3
+        uses: astral-sh/ruff-action@v4
 
       - name: Run tests with coverage
         run: |
           poetry run pytest --cov=src/ --cov-report=xml --no-cov-on-fail
 
       - name: Send coverage to CodeCov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v6
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: false

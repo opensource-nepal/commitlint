@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Commitlint
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Run commitlint
         # uses: opensource-nepal/commitlint@v1
