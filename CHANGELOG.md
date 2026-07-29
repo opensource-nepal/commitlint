@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## [2.0.0](https://github.com/opensource-nepal/commitlint/compare/v1.13.3...v2.0.0) (2026-07-29)
+
+
+### ⚠ BREAKING CHANGES
+
+* add max-header-length for header length check ([#85](https://github.com/opensource-nepal/commitlint/issues/85))
+* Node 24 support for commitlint action
+
+### Features
+
+* add max-header-length for header length check ([#85](https://github.com/opensource-nepal/commitlint/issues/85)) ([060a988](https://github.com/opensource-nepal/commitlint/commit/060a988e2a87eb91f05789915e1ebc6c3586e023))
+* **console:** add color to standard output and standard error ([#86](https://github.com/opensource-nepal/commitlint/issues/86)) ([b428eea](https://github.com/opensource-nepal/commitlint/commit/b428eea2b1909c311a63c51428916be952d17c74))
+* Node 24 support for commitlint action ([552dcbd](https://github.com/opensource-nepal/commitlint/commit/552dcbd82f06f797a6f1b189418c521205a96013))
+
 ## [1.13.3](https://github.com/opensource-nepal/commitlint/compare/v1.3.2...v1.13.3) (2026-01-11)
 
 
