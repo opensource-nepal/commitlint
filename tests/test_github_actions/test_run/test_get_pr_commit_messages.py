@@ -37,9 +37,10 @@ def test__get_pr_commit_messages__single_page(
         result = get_pr_commit_messages(event)
         assert result == ["feat: commit message"]
 
+    repo = os.environ["GITHUB_REPOSITORY"]
     mock_request_github_api.assert_called_once_with(
         method="GET",
-        url="/repos/opensource-nepal/commitlint/pulls/10/commits",
+        url=f"/repos/{repo}/pulls/10/commits",
         token="token",
         params={"per_page": PER_PAGE_COMMITS, "page": 1},
     )
@@ -69,16 +70,17 @@ def test__get_pr_commit_messages__multiple_page(
         assert result == ["feat: commit message1", "feat: commit message2"]
 
     assert mock_request_github_api.call_count == 2
+    repo = os.environ["GITHUB_REPOSITORY"]
     mock_request_github_api.assert_any_call(
         method="GET",
-        url="/repos/opensource-nepal/commitlint/pulls/10/commits",
+        url=f"/repos/{repo}/pulls/10/commits",
         token="token",
         params={"per_page": PER_PAGE_COMMITS, "page": 1},
     )
 
     mock_request_github_api.assert_any_call(
         method="GET",
-        url="/repos/opensource-nepal/commitlint/pulls/10/commits",
+        url=f"/repos/{repo}/pulls/10/commits",
         token="token",
         params={"per_page": PER_PAGE_COMMITS, "page": 2},
     )

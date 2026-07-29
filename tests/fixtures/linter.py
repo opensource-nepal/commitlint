@@ -2,7 +2,6 @@
 # pylint: disable=all
 from typing import List, Tuple
 
-from commitlint.constants import COMMIT_HEADER_MAX_LENGTH
 from commitlint.messages import (
     COMMIT_TYPE_INVALID_ERROR,
     COMMIT_TYPE_MISSING_ERROR,
@@ -11,7 +10,6 @@ from commitlint.messages import (
     DESCRIPTION_MISSING_ERROR,
     DESCRIPTION_MULTIPLE_SPACE_START_ERROR,
     DESCRIPTION_NO_LEADING_SPACE_ERROR,
-    HEADER_LENGTH_ERROR,
     INCORRECT_FORMAT_ERROR,
     SCOPE_EMPTY_ERROR,
     SCOPE_WHITESPACE_ERROR,
@@ -36,11 +34,6 @@ LINTER_FIXTURE_PARAMS: Tuple[Tuple[str, bool, List[str], List[str]], ...] = (
     # success
     ("feat: add new feature", True, []),
     ("feat: add new feature\n\nthis is body", True, []),
-    (
-        "feat: add new feature\n\nthis is body" + "a" * COMMIT_HEADER_MAX_LENGTH,
-        True,
-        [],
-    ),
     ("feat: add new feature\n\nthis is body\n\ntest", True, []),
     ("feat: add new feature\n", True, []),
     ("build(deps-dev): bump @babel/traverse from 7.22.17 to 7.24.0", True, []),
@@ -64,14 +57,6 @@ LINTER_FIXTURE_PARAMS: Tuple[Tuple[str, bool, List[str], List[str]], ...] = (
     ("initial Commit", True, []),
     # incorrect format check
     ("feat add new feature", False, [INCORRECT_FORMAT_ERROR]),
-    # header length check
-    ("feat: " + "a" * (COMMIT_HEADER_MAX_LENGTH - 1), False, [HEADER_LENGTH_ERROR]),
-    ("feat: " + "a" * (COMMIT_HEADER_MAX_LENGTH - 1), False, [HEADER_LENGTH_ERROR]),
-    (
-        "Test " + "a" * (COMMIT_HEADER_MAX_LENGTH + 1),
-        False,
-        [HEADER_LENGTH_ERROR, INCORRECT_FORMAT_ERROR],
-    ),
     # commit type check
     (": add new feature", False, [COMMIT_TYPE_MISSING_ERROR]),
     ("(invalid): add new feature", False, [COMMIT_TYPE_MISSING_ERROR]),

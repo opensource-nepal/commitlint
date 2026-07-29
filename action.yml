@@ -10,6 +10,9 @@ inputs:
     description: Verbose output.
     default: "false"
     required: false
+  max_header_length:
+    description: "Maximum header length to check. If not specified, the header length is not checked."
+    required: false
   token:
     description: Token for fetching commits using Github API.
     default: ${{ github.token }}
@@ -48,3 +51,4 @@ runs:
         INPUT_TOKEN: ${{ inputs.token }}
         INPUT_FAIL_ON_ERROR: ${{ inputs.fail_on_error }}
         INPUT_VERBOSE: ${{ inputs.verbose }}
+        INPUT_MAX_HEADER_LENGTH: ${{ inputs.max_header_length }}

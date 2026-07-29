@@ -6,6 +6,7 @@ to conventional commit standards.
 from typing import List, Tuple
 
 from .. import console
+from ..app_params import AppParams
 from .utils import is_ignored, remove_comments
 from .validators import (
     HeaderLengthValidator,
@@ -16,17 +17,15 @@ from .validators import (
 
 
 def lint_commit_message(
-    commit_message: str, skip_detail: bool = False, strip_comments: bool = False
+    commit_message: str, params: AppParams
 ) -> Tuple[bool, List[str]]:
     """
     Lints a commit message.
 
     Args:
         commit_message (str): The commit message to be linted.
-        skip_detail (bool, optional): Whether to skip the detailed error linting
-            (default is False).
-        strip_comments (bool, optional): Whether to remove comments from the
-            commit message (default is False).
+        params (AppParams): Application parameters for configuring
+                            validation and output.
 
     Returns:
         Tuple[bool, List[str]]: Returns success as a first element and list of errors
@@ -37,7 +36,7 @@ def lint_commit_message(
 
     # perform processing and pre checks
     # removing unnecessary commit comments
-    if strip_comments:
+    if params.strip_comments:
         console.verbose("removing comments from the commit message")
         commit_message = remove_comments(commit_message)
 
@@ -48,15 +47,18 @@ def lint_commit_message(
         return True, []
 
     # for skip_detail check
-    if skip_detail:
+    if params.skip_detail:
         console.verbose("running simple validators for linting")
         return run_validators(
             commit_message,
+            params,
             validator_classes=[HeaderLengthValidator, SimplePatternValidator],
             fail_fast=True,
         )
 
     console.verbose("running detailed validators for linting")
     return run_validators(
-        commit_message, validator_classes=[HeaderLengthValidator, PatternValidator]
+        commit_message,
+        params,
+        validator_classes=[HeaderLengthValidator, PatternValidator],
     )

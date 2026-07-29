@@ -56,6 +56,52 @@ def get_boolean_input(key: str) -> bool:
     )
 
 
+def get_int_input(key: str) -> int | None:
+    """
+    Read the GitHub action integer input.
+
+    Args:
+        key: Input key.
+
+    Returns:
+        The integer value of the input. If not integer, returns None
+
+    Raises:
+        ValueError: If the value is a non-empty, non-integer string.
+    """
+    val = get_input(key)
+
+    if val == "":
+        # GitHub Action passes empty data as a empty string ("")
+        return None
+
+    try:
+        return int(val)
+    except ValueError:
+        raise ValueError(f"Input '{key}' must be a valid integer.") from None
+
+
+def get_positive_int_input(key: str) -> int | None:
+    """
+    Read the GitHub action integer input.
+
+    Args:
+        key: Input key.
+
+    Returns:
+        The integer value of the input. If not integer, returns None
+
+    Raises:
+        ValueError: If the value is a non-empty, non-integer string.
+    """
+    int_val = get_int_input(key)
+
+    if int_val is not None and int_val <= 0:
+        raise ValueError(f"Input '{key}' must be a positive integer.")
+
+    return int_val
+
+
 def write_line_to_file(filepath: str, line: str) -> None:
     """
     Write line to a specified filepath.

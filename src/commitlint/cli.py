@@ -20,12 +20,37 @@ from typing import List
 
 from . import console
 from .__version__ import __version__
+from .app_params import AppParams
 from .config import config
 from .exceptions import CommitlintException
 from .git_helpers import get_commit_message_of_hash, get_commit_messages_of_hash_range
 from .linter import lint_commit_message
 from .linter.utils import remove_diff_from_commit_message
 from .messages import VALIDATION_FAILED, VALIDATION_SUCCESSFUL
+
+
+def positive_int_type(value: str) -> int:
+    """
+    Parse a positive integer (> 0).
+
+    Args:
+        value: Input value.
+
+    Raises:
+        argparse.ArgumentTypeError: If value is not a positive integer.
+
+    Returns:
+        Parsed positive integer.
+    """
+    try:
+        ivalue = int(value)
+    except (ValueError, TypeError):
+        raise argparse.ArgumentTypeError(f"{value} is not a valid integer") from None
+
+    if ivalue <= 0:
+        raise argparse.ArgumentTypeError("Value must be a positive integer (> 0)")
+
+    return ivalue
 
 
 def get_args() -> argparse.Namespace:
@@ -94,6 +119,16 @@ def get_args() -> argparse.Namespace:
         default=False,
     )
 
+    # --max-header-length : enables header length check (optional)
+    parser.add_argument(
+        "--max-header-length",
+        type=positive_int_type,
+        help=(
+            "Maximum header length to check. If not specified, the header length is not checked."
+        ),
+        default=None,
+    )
+
     # parsing args
     args = parser.parse_args()
 
@@ -103,8 +138,7 @@ def get_args() -> argparse.Namespace:
 def _show_errors(
     commit_message: str,
     errors: List[str],
-    skip_detail: bool = False,
-    hide_input: bool = False,
+    params: AppParams,
 ) -> None:
     """
     Display a formatted error message for a list of errors.
@@ -112,17 +146,17 @@ def _show_errors(
     Args:
         commit_message (str): The commit message to display.
         errors (List[str]): A list of error messages to be displayed.
-        skip_detail (bool): Whether to skip the detailed error message.
-        hide_input (bool): Hide input from stdout/stderr.
+        params (AppParams): Application parameters for configuring
+                            validation and output.
     """
     error_count = len(errors)
 
     commit_message = remove_diff_from_commit_message(commit_message)
 
-    if not hide_input:
+    if not params.hide_input:
         console.error(f"⧗ Input:\n{commit_message}\n")
 
-    if skip_detail:
+    if params.skip_detail:
         console.error(VALIDATION_FAILED)
         return
 
@@ -154,43 +188,40 @@ def _get_commit_message_from_file(filepath: str) -> str:
 
 def _handle_commit_message(
     commit_message: str,
-    skip_detail: bool,
-    hide_input: bool,
-    strip_comments: bool = False,
+    params: AppParams,
 ) -> None:
     """
     Handles a single commit message, checks its validity, and prints the result.
 
     Args:
         commit_message (str): The commit message to be handled.
-        skip_detail (bool): Whether to skip the detailed error linting.
-        hide_input (bool): Hide input from stdout/stderr.
-        strip_comments (bool, optional): Whether to remove comments from the
-            commit message (default is False).
+        params (AppParams): Application parameters for configuring
+                            validation and output.
 
     Raises:
         SystemExit: If the commit message is invalid.
     """
-    success, errors = lint_commit_message(commit_message, skip_detail, strip_comments)
+    success, errors = lint_commit_message(commit_message, params)
 
     if success:
         console.success(VALIDATION_SUCCESSFUL)
         return
 
-    _show_errors(commit_message, errors, skip_detail, hide_input)
+    _show_errors(commit_message, errors, params)
     sys.exit(1)
 
 
 def _handle_multiple_commit_messages(
-    commit_messages: List[str], skip_detail: bool, hide_input: bool
+    commit_messages: List[str],
+    params: AppParams,
 ) -> None:
     """
     Handles multiple commit messages, checks their validity, and prints the result.
 
     Args:
         commit_messages (List[str]): List of commit messages to be handled.
-        skip_detail (bool): Whether to skip the detailed error linting.
-        hide_input (bool): Hide input from stdout/stderr.
+        params (AppParams): Application parameters for configuring
+                            validation and output.
 
     Raises:
         SystemExit: If any of the commit messages is invalid.
@@ -198,13 +229,13 @@ def _handle_multiple_commit_messages(
     has_error = False
 
     for commit_message in commit_messages:
-        success, errors = lint_commit_message(commit_message, skip_detail)
+        success, errors = lint_commit_message(commit_message, params)
         if success:
             console.verbose("lint success")
             continue
 
         has_error = True
-        _show_errors(commit_message, errors, skip_detail, hide_input)
+        _show_errors(commit_message, errors, params)
         console.error("")
 
     if has_error:
@@ -230,15 +261,23 @@ def main() -> None:
             commit_message = _get_commit_message_from_file(args.file)
             _handle_commit_message(
                 commit_message,
-                skip_detail=args.skip_detail,
-                hide_input=args.hide_input,
-                strip_comments=True,
+                AppParams(
+                    skip_detail=args.skip_detail,
+                    hide_input=args.hide_input,
+                    max_header_length=args.max_header_length,
+                    strip_comments=True,
+                ),
             )
         elif args.hash:
             console.verbose("commit message source: hash")
             commit_message = get_commit_message_of_hash(args.hash)
             _handle_commit_message(
-                commit_message, skip_detail=args.skip_detail, hide_input=args.hide_input
+                commit_message,
+                AppParams(
+                    skip_detail=args.skip_detail,
+                    hide_input=args.hide_input,
+                    max_header_length=args.max_header_length,
+                ),
             )
         elif args.from_hash:
             console.verbose("commit message source: hash range")
@@ -247,14 +286,22 @@ def main() -> None:
             )
             _handle_multiple_commit_messages(
                 commit_messages,
-                skip_detail=args.skip_detail,
-                hide_input=args.hide_input,
+                AppParams(
+                    skip_detail=args.skip_detail,
+                    hide_input=args.hide_input,
+                    max_header_length=args.max_header_length,
+                ),
             )
         else:
             console.verbose("commit message source: direct message")
             commit_message = args.commit_message.strip()
             _handle_commit_message(
-                commit_message, skip_detail=args.skip_detail, hide_input=args.hide_input
+                commit_message,
+                AppParams(
+                    skip_detail=args.skip_detail,
+                    hide_input=args.hide_input,
+                    max_header_length=args.max_header_length,
+                ),
             )
     except CommitlintException as ex:
         console.error(f"{ex}")
